@@ -46,7 +46,7 @@ This chapter is structured as follows:
       first-order logic formulas, i.e., we will specify those strings that are regarded as first-order
       formulas.
 \item In the following section, we deal with the
-      \href{https://en.wikipedia.org/wiki/Semantics}{semantics} of these formulas, That is we specify the 
+      \href{https://en.wikipedia.org/wiki/Semantics}{semantics} of these formulas, that is we specify the 
       meaning of first-order formulas.
 \item After that, we show how to implement syntax and semantics in \textsl{Python}.
 \item As an application of first-order logic we discuss \textcolor{blue}{constraint programming}.
@@ -81,6 +81,11 @@ arity of these symbols.
         \hspace*{1.3cm} $\textsl{arity}: \mathcal{F} \cup \mathcal{P} \rightarrow \mathbb{N}$. \\[0.2cm]
         We say that the function or predicate symbol $f$ is an
         $n$-ary symbol if $\textsl{arity}(f) = n$.
+        
+        A function symbol $c$ such that $\textsl{arity}(c) = 0$ is called a \blue{constant}. \index{constant}
+        
+        A predicate symbol $p$ such that $\textsl{arity}(p) = 0$ is called a \blue{propositional variable}.
+        \index{propositional variable}
   \item Since we need to be able to distinguish between variables, function symbols, and predicate symbols,
         we agree that the sets $\mathcal{V}$, $\mathcal{F}$, and $\mathcal{P}$ have to be pairwise disjoint: \\[0.2cm] 
         \hspace*{1.3cm} $\mathcal{V} \cap \mathcal{F} = \{\}$, \quad
@@ -89,23 +94,43 @@ arity of these symbols.
   \end{enumerate}
 \end{Definition}
 
+\exampleEng
+Next, we define the signature $\Sigma_G$ of group theory. Let
+\begin{enumerate}
+\item $\mathcal{V} := \{ x, y, z \}$ be the set of variables,
+\item $\mathcal{F} := \{ \mathtt{e}, \circ \}$ be the set of function symbols,
+\item $\mathcal{P} := \{\mathtt{=} \}$ be the set of predicate symbols,
+\item $\textsl{arity} := \bigl\{ \mathtt{e} \mapsto 0, \mathtt{\circ} \mapsto 2, = \mapsto 2 \bigr\}$
+      specifes the arities of function and predicate symbols.
+\end{enumerate}
+Then the signature $\Sigma_G$ of group theory is defined as follows:
+\\[0.2cm]
+\hspace*{1.3cm}
+$\Sigma_G := \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$.
+\eox
+\vspace{0.3cm}
+
 \noindent
 We use expressions built from variables and function symbols as identifiers for objects. These expressions are
 called \textcolor{blue}{terms}.\index{terms} The formal definition follows.
 
-\begin{Definition}[Terms, $\mathcal{T}_\Sigma$]
-  If $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$ is a signature, then we define the set of \textcolor{blue}{$\Sigma$-terms},
-  \textcolor{blue}{$\mathcal{T}_\Sigma$} \index{$\mathcal{T}_\Sigma$} inductively:
+\begin{Definition}[Terms, $\mathcal{T}_\Sigma$] \hspace*{\fill} \\
+  If $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$ is a signature, then we
+  define the set \textcolor{blue}{$\mathcal{T}_\Sigma$} \index{$\mathcal{T}_\Sigma$}  of
+  \textcolor{blue}{$\Sigma$-terms}, 
+  inductively:
   \begin{enumerate}
   \item For every variable $x \in \mathcal{V}$, we have that $x \in \mathcal{T}_\Sigma$. Thus, every variable is also a term.
-  \item If $f \in \mathcal{F}$ is an $n$-ary function symbol and 
+  \item If $c \in \mathcal{F}$ is a $0$-ary function symbol,
+        i.e.~$\textsl{arity}(c) = 0$, then $c \in \mathcal{T}_\Sigma$.
+
+        Therefore, every constant is a term.
+  \item If $f \in \mathcal{F}$ is an $n$-ary function symbol such that $n > 0$ and 
         $t_1,\cdots,t_n \in \mathcal{T}_\Sigma$, then 
         \\[0.2cm]
         \hspace*{1.3cm} $f(t_1,\cdots,t_n) \in \mathcal{T}_\Sigma$,
         \\[0.2cm]
         thus the expression $f(t_1,\cdots,t_n) \in \mathcal{T}_\Sigma$ is a term.
-        If $c \in \mathcal{F}$ is a nullary function symbol, we also allow the notation
-        $c$ instead of $c()$. In this case, we call $c$ a \textcolor{blue}{constant}.\index{constant}
         \eox
   \end{enumerate}
 \end{Definition}
@@ -141,17 +166,22 @@ we write $x+y$ instead of $+(x,y)$. The infix notation is then to be understood 
 above-defined representation. This, of course, works only if we also set precedence levels for the various operators.
 \eox
 
-Next, we define the concept of \textcolor{blue}{atomic formulas}.\index{Atomic Formulas} These are formulas that cannot be decomposed into smaller formulas: atomic formulas thus contain neither connectives nor quantifiers.
+Next, we define the concept of \textcolor{blue}{atomic formulas}.\index{Atomic Formulas} These are formulas
+that cannot be decomposed into smaller formulas: atomic formulas thus contain neither propositional connectives
+nor quantifiers. 
 \begin{Definition}[Atomic Formulas, $\mathcal{A}_\Sigma$]
   Given a signature $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$. 
   The set of atomic $\Sigma$-formulas $\mathcal{A}_\Sigma$ \index{$\mathcal{A}_\Sigma$}
-  is defined as follows: If $p \in \mathcal{P}$ is an $n$-ary predicate symbol
-  and $n$ $\Sigma$-terms $t_1$, $\cdots$, $t_n$ are given, then
-  $p(t_1,\cdots,t_n)$ is an \textcolor{blue}{atomic $\Sigma$-formula}: \\[0.2cm]
-  \hspace*{1.3cm} $p(t_1,\cdots,t_n) \in \mathcal{A}_\Sigma$.  \\[0.2cm]
-  If $p$ is a nullary predicate symbol, then we also write $p$ instead of $p()$.
-  In this case, we call $p$ a \textcolor{blue}{propositional variable}.\index{Propositional Variable}
-  \eox
+  is defined as follows:
+  \begin{enumerate}
+  \item $\verum \in \mathcal{A}_\Sigma$ and  $\falsum \in \mathcal{A}_\Sigma$.
+  \item If $p \in \mathcal{P}$ and $\textsl{arity}(p)= 0$, then $p \in \mathcal{A}_\Sigma$.
+
+        Therefore, propositional variables are atomic formulas.
+  \item If $p \in \mathcal{P}$ is an $n$-ary predicate symbol such that $n > 0$ and, furthermore,  $n$ $\Sigma$-terms
+        $t_1$, $\cdots$, $t_n$ are given, then  $p(t_1,\cdots,t_n)$ is an \textcolor{blue}{atomic $\Sigma$-formula}: \\[0.2cm]
+        \hspace*{1.3cm} $p(t_1,\cdots,t_n) \in \mathcal{A}_\Sigma$.  \qed
+  \end{enumerate}
 \end{Definition}
 
 \exampleEng
@@ -160,7 +190,14 @@ Continuing from the last example, we can see that \\[0.2cm]
 is an atomic $\Sigma_\mathrm{arith}$-formula. Note that we have not yet discussed the truth value of such
 formulas. The question of whether a formula is considered true or false
 will be explored in the next section.
+
+In practice we will often use infix notation for binary predicate symbols.  The atomic formula given above is then
+written as
+\\[0.2cm]
+\hspace*{1.3cm}
+$(0 + x) * 1 = 0$.
 \eox
+
 
 \subsection{Bound Variables and Free Variables}
 In defining first-order logic formulas, it is necessary
@@ -171,7 +208,7 @@ Consider the following equation: \\[0.2cm]
 \hspace*{1.3cm}
 $\ds\int_{0}^{x} y \cdot t\, dt = \frac{1}{2} \cdot x^2 \cdot y$
 \\[0.2cm]
-In this equation, the variables $x$ and $y$ appear \textcolor{blue}{free}, while the variable $t$ is \textcolor{blue}{bound} by the integral.
+In this equation, the variables $x$ and $y$ occur \textcolor{blue}{free}, while the variable $t$ is \textcolor{blue}{bound} by the integral.
 This means the following: We can substitute arbitrary values for $x$ and $y$ in this equation without
 changing the validity of the formula. For example, substituting $2$ for $x$, we get \\[0.2cm]
 \hspace*{1.3cm}
@@ -213,10 +250,11 @@ $\Sigma$-term $t$ the set of variables contained in $t$.
 \begin{Definition}[$\var(t)$]
   \index{$\var(t)$}
   Given a signature $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$ and
-  $t$ a $\Sigma$-term, we define the set \textcolor{blue}{$\var(t)$} of variables that appear in $t$
+  $t$ a $\Sigma$-term, we define the set \textcolor{blue}{$\var(t)$} of variables that occur in $t$
   by induction on the structure of the term:
   \begin{enumerate}
     \item $\var(x) := \{ x \}$ \quad for all $x \in \mathcal{V}$,
+    \item $\var(c) := \{ \}$ \quad for all $c \in \mathcal{F}$ such that $\textsl{arity}(c) = 0$,
     \item $\var\bigl(f(t_1,\cdots,t_n)\bigr) := \var(t_1) \cup \cdots \cup \var(t_n)$.
           \eox
   \end{enumerate}
@@ -230,10 +268,16 @@ $\Sigma$-term $t$ the set of variables contained in $t$.
 Let $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$ be a signature.
     We denote the set of \textcolor{blue}{$\Sigma$-\emph{Formulas}} by $\mathbb{F}_\Sigma$.
     We define this set inductively.
-    Simultaneously, for each formula $F \in \mathbb{F}_\Sigma$, we define the set $\textsl{BV}(F)$ of variables that appear \textcolor{blue}{bound} in $F$ and the set $\textsl{FV}(F)$ of variables that appear \textcolor{blue}{free} in $F$.
+    Simultaneously, for each formula $F \in \mathbb{F}_\Sigma$, we define the set $\textsl{BV}(F)$ of variables
+    that occur \textcolor{blue}{bound} in $F$ and the set $\textsl{FV}(F)$ of variables that occur
+    \textcolor{blue}{free} in $F$. 
     \begin{enumerate}
     \item $\falsum \in \mathbb{F}_\Sigma$ and $\verum \in \mathbb{F}_\Sigma$, and we define \\[0.2cm]
           \hspace*{1.3cm} $\FV(\falsum) := \FV(\verum) := \BV(\falsum) := \BV(\verum) := \{\}$.
+    \item If $p \in \mathcal{A}_\Sigma$ and $\textsl{arity}(p)= 0$, then $p \in \mathbb{F}_\Sigma$ and    
+          \\[0.2cm]
+          \hspace*{1.3cm}
+          \hspace*{1.3cm} $\FV(p) := \{\}$ \quad and \quad $\BV(p) := \{\}$.
     \item If $F = p(t_1,\cdots,t_n)$ is an atomic $\Sigma$-formula, then $F \in \mathbb{F}_\Sigma$.
           Furthermore, we have
           \begin{enumerate}
@@ -291,7 +335,7 @@ is a formula from $\mathbb{F}_{\Sigma_{\mathrm{arith}}}$.
 The set of bound variables is $\{x\}$, the set of free variables is 
 $\{ y \}$. \eox
 
-If we always wrote formulas in the prefix notation defined above, then readability would suffer
+If we would always write formulas in the prefix notation defined above, then readability would suffer
 disproportionately.  
 To abbreviate, we agree that in first-order logic the same rules for saving parentheses apply that we have
 already used in propositional logic. In addition, the same quantifiers are combined: for example, we write   
@@ -300,25 +344,87 @@ already used in propositional logic. In addition, the same quantifiers are combi
 $\forall x, y \colon p(x, y)  \quad \text{instead of} \quad \forall x \colon ( \forall y \colon p(x,y))$.
 \\[0.2cm]
 Moreover, we agree that we may also indicate binary predicate and function symbols in infix notation.
-To ensure clear readability, we must then define the precedence of the function symbols.
-For example, we write \\[0.2cm]
+In order to guarantee a unique readability, we must then define the precedence and the associativity of the
+function symbols.  For example, we write \\[0.2cm]
 \hspace*{1.3cm} $\mathtt{n}_1 = \mathtt{n}_2$  \quad instead of \quad $=(\mathtt{n}_1, \mathtt{n}_2)$. \\[0.2cm]
 The formula $(\exists x \colon \leq(\mathtt{+}(y, x),y))$ becomes more readable as \\[0.2cm]
 \hspace*{1.3cm} $\exists x \colon y + x \leq y$ \\[0.2cm]
-Moreover, in the literature, you often find expressions of the form
+Moreover, in the literature, you will often find expressions of the form
 \\[0.2cm]
 \hspace*{1.3cm}
 $\forall x \in M: F$ \quad or \quad $\exists x \in M: F$.
 \\[0.2cm]
-These are abbreviations, defined as
+These are abbreviations defined as
 \\[0.2cm]
 \hspace*{1.3cm}
-$\ds \bigl(\forall x \in M: F\bigr) \stackrel{\mathrm{def}}{\Longleftrightarrow} \forall x: \bigl(x \in M \rightarrow F\bigr)$,
+$\ds \bigl(\forall x \in M: F\bigr) \stackrel{\mathrm{def}}{\Longleftrightarrow} \forall x: \bigl(x \in M \rightarrow F\bigr)$
 \quad and \quad 
 $\ds\bigl(\exists x \in M: F\bigr) \stackrel{\mathrm{def}}{\Longleftrightarrow} \exists x: \bigl(x \in M \wedge F\bigr)$.
+\\[0.2cm]
+Finally, we agree that quantifiers bind more tightly than the operators $\wedge$, $\vee$, $\rightarrow$, and
+$\leftrightarrow$. 
+
+\exerciseEng
+\noindent \textbf{Consider the following signature for formalizing family relationships:}
+\begin{itemize}
+    \item \textbf{Variables:} $\{ u, v, w, x, y, z \}$.
+    \item \textbf{Function Symbols:}
+    \begin{itemize}
+        \item $\texttt{mother}(x)$: the mother of $x$.
+        \item $\texttt{father}(x)$: the father of $x$.
+    \end{itemize}
+    \item \textbf{Unary Predicates:}
+    \begin{itemize}
+        \item $\texttt{female}(x)$: $x$ is female.
+        \item $\texttt{male}(x)$: $x$ is male.
+    \end{itemize}
+    \item \textbf{Binary Predicates:}
+    \begin{itemize}
+    \item $\texttt{brother}(x,y)$: $x$ is a brother of $y$.
+    \item $\texttt{sister}(x,y)$: $x$ is a sister of $y$.
+    \item $\texttt{sibling}(x,y)$: $x$ is a sibling of $y$.
+    \item $\texttt{married}(x,y)$: $x$ is married to $y$.
+    \item $\texttt{grandmother}(x,y)$: $x$ is a grandmother of $y$.
+    \item $\texttt{grandfather}(x,y)$: $x$ is a grandfather of $y$.
+    \item $\texttt{grandchild}(x, y)$: $x$ is a grandchild of $y$,
+    \item $\texttt{uncle}(x,y)$: $x$ is an uncle of $y$.
+    \item $\texttt{aunt}(x,y)$: $x$ is an aunt of $y$.
+    \item $\texttt{cousin}(x,y)$: $x$ is a cousin of $y$.
+    \end{itemize}
+\end{itemize}
+In the following, your task is to \blue{define} certain predicates. In general, a \blue{definition} of an
+$n$-ary predicate $p$ has the form 
+\\[0.2cm]
+\hspace*{1.3cm}
+$\forall x_1, \cdots, x_n: \bigl(p(x_1,\cdots,x_n) \leftrightarrow F\bigr)$,
+\\[0.2cm]
+where $F$ is a formula that does not contain the predicate $p$.  In this exercise, this formula
+may only contain the function symbols \texttt{mother} and \texttt{father} and the predicate symbols \texttt{male} and
+\texttt{female}.  For the purpose of this exercise we make the simplifying assumption that
+every person is either femal or male.
+
+As an example, to \texttt{define} the predicate \texttt{brother} we can use the following formula:
+\\[0.2cm]
+\hspace*{1.3cm}
+$\forall x, y:\bigl(\mathtt{brother}(x, y) \leftrightarrow \mathtt{male}(x) \wedge \mathtt{father}(x)
+= \mathtt{father}(y) \wedge \mathtt{mother}(x) = \mathtt{mother}(y)\bigr)$
+\\[0.2cm]
+Define the following predicates:
+\begin{enumerate}[(a)]
+\item $\texttt{sister}(x, y)$,
+\item $\texttt{aunt}(x, y)$,
+\item $\mathtt{uncle}$,
+\item $\texttt{sibling}(x, y)$,
+\item $\texttt{grandfather}(x, y)$,
+\item $\texttt{grandmother}(x, y)$,
+\item $\texttt{grandchild}(x, y)$,
+\item $\texttt{cousin}(x, y)$.
+  \eox
+\end{enumerate}
+
 
 \section{Semantics of First-Order Logic \label{sec:semantik}}
-Next, we define the meaning of the formulas. For this purpose, we introduce the concept of a
+Next, we define the \blue{meaning} of the formulas. For this purpose, we introduce the concept of a
 \blue{$\Sigma$-structure}. \index{$\Sigma$-structure} This kind of structure specifies how the
 function and predicate symbols of the signature $\Sigma$ are to be interpreted.
 
@@ -334,20 +440,25 @@ function and predicate symbols of the signature $\Sigma$ are to be interpreted.
         \item $\mathcal{J}$ is the \blue{interpretation} \index{interpretation} of the function and predicate symbols.
               Formally, we define $\mathcal{J}$ as a mapping with the following properties:
         \begin{enumerate}
-        \item Every function symbol $f \in \mathcal{F}$ with $\textsl{arity}(f) = m$ is mapped to
+        \item Every function symbol $c \in \mathcal{F}$ with $\textsl{arity}(f) = 0$ is mapped to an element
+              of $\mathcal{U}$, i.e.~we have $\mathcal{J}(c) \in \mathcal{U}$.  Instead of writing
+              $\mathcal{J}(c)$ we will write $c^{\mathcal{J}}$.
+        \item Every function symbol $f \in \mathcal{F}$ with $\textsl{arity}(f) = m$ and $m > 0$ is mapped to
               an $m$-ary function \\[0.2cm]
               \hspace*{1.3cm}
               $f^\mathcal{J}\colon \mathcal{U}^m \rightarrow \mathcal{U}$ \\[0.2cm]
               that maps $m$-tuples of the universe $\mathcal{U}$ into the universe $\mathcal{U}$.
-        \item Every predicate symbol $p \in \mathcal{P}$ with $\textsl{arity}(p) = n$ is mapped to
+        \item Every predicate symbol $p \in \mathcal{P}$ with $\textsl{arity}(p) = 0$ is mapped to
+              the set $\mathbb{B}$ of truth values, i.e.~$p^{\mathcal{J}} \in \{ \mathtt{True}, \mathtt{False}\}$.
+        \item Every predicate symbol $p \in \mathcal{P}$ with $\textsl{arity}(p) = n$ such that $n > 0$ is mapped to
               a subset \\[0.2cm]
               \hspace*{1.3cm} 
-              $p^\mathcal{J} \subseteq \mathcal{U}^n$ \\[0.2cm]
+              $p^\mathcal{J} \subseteq \mathcal{U}^n$. \\[0.2cm]
               The idea is that an atomic formula of the form $p(t_1, \cdots, t_n)$
-              is interpreted as true exactly when the interpretation of the tuple
+              is interpreted as $\texttt{True}$ exactly if the interpretation of the tuple
               $\langle t_1, \cdots, t_n \rangle$ is an element of the set $p^\mathcal{J}$.
-        \item If the symbol ``$=$'' is a member of the set of predicate symbols $\mathcal{P}$, then
-              interpretation of  the equality symbol ``$=$'' has to be \emph{canonical}, i.e.~we must have
+        \item If the symbol ``$=$'' is a member of the set of predicate symbols $\mathcal{P}$, then the
+              interpretation of  the equality symbol ``$=$'' has to be \blue{canonical}, i.e.~we must have
               \\[0.2cm]
               \hspace*{1.3cm}  
               $=^\mathcal{J} \;=\; \bigl\{ \langle u, u \rangle \mid u \in \mathcal{U} \bigr\}$.
@@ -371,7 +482,7 @@ The signature $\Sigma_G$ of group theory is defined as \\[0.2cm]
 \item $\textsl{arity} = \bigl\{ \pair(\mathrm{e},0), \pair(*,2), \pair(\mathtt{=},2)\bigr\}$
 \end{enumerate}
 We can then define a $\Sigma_G$ structure $\mathcal{Z} = \langle \{0,1\},\mathcal{J}\rangle$ 
-by setting the interpretation $\mathcal{J}$ 
+by defining the interpretation $\mathcal{J}$ 
 as follows:
 \begin{enumerate}
 \item $\mathrm{e}^\mathcal{J} := 0$,
@@ -410,13 +521,15 @@ for these variables. Which values we substitute is determined by a \blue{variabl
 
 
 \begin{Definition}[Interpretation of Terms]
-    If $\struct = \pair(\mathcal{U},\mathcal{J})$ is a  $\Sigma$-structure and $\mathcal{I}$ is an  $\struct$
+  If $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$ is a signature
+  $\struct = \pair(\mathcal{U},\mathcal{J})$ is a  $\Sigma$-structure and $\mathcal{I}$ is an  $\struct$
     variable assignment, then for every term $t$ the \blue{value} \blue{$\struct(\mathcal{I}, t)$}
     \index{$\struct(\mathcal{I}, t)$} is defined by induction on $t$:
     \begin{enumerate}
     \item If $x \in \mathcal{V}$ we define: \\[0.2cm]
           \hspace*{1.3cm} $\struct(\mathcal{I}, x) := \mathcal{I}(x)$.
-    \item If $t$ is a term of the form $f(t_1,\cdots,t_n)$ we define \\[0.2cm]
+    \item If $c \in \mathcal{F}$ and $\textsl{arity}(c) = 0$, then $\mathcal{S}(\mathcal{I}, c) := c^\mathcal{J}$.
+    \item If $t$ is a term of the form $f(t_1,\cdots,t_n)$, then we define \\[0.2cm]
           \hspace*{1.3cm} $\struct\bigl(\mathcal{I}, f(t_1,\cdots,t_n)\bigr) := 
                            f^\mathcal{J}\bigl( \struct(\mathcal{I}, t_1), \cdots, \struct(\mathcal{I}, t_n) \bigr)$.
                            \eox
@@ -436,15 +549,7 @@ The previous line is interpreted as follows:
 Then we have  \\[0.2cm]
 \hspace*{1.3cm}  $\mathcal{Z}\bigl(\mathcal{I}, \mathtt{x} * \mathtt{y} \bigr) = 1$. \eox
 
-\begin{Definition}[Semantics of Atomic $\Sigma$-Formulas]
-    If $\struct$ is a  $\Sigma$-structure and $\mathcal{I}$ is an $\struct$ variable assignment,
-    then for each atomic $\Sigma$-Formel 
-    $p(t_1, \cdots, t_n)$ we define the value \blue{$\struct\bigl(\mathcal{I}, p(t_1, \cdots, t_n) \bigr)$} as follows: \\[0.2cm]
-    \hspace*{1.3cm}
-    $\struct\bigl(\mathcal{I}, p(t_1,\cdots,t_n)\bigr) := 
-       \Bigl(\bigl\langle \struct(\mathcal{I}, t_1), \cdots, \struct(\mathcal{I}, t_n) \bigr\rangle \in p^\mathcal{J}\Bigr)$.
-    \eox
-\end{Definition}
+
 
 \exampleEng
 If we continue our previous example we have
@@ -462,15 +567,23 @@ available, just like in propositional logic:
 \item $\circright: \mathbb{B} \times \mathbb{B} \rightarrow \mathbb{B}$,
 \item $\circleftright: \mathbb{B} \times \mathbb{B} \rightarrow \mathbb{B}$.
 \end{enumerate}
-The definitions of these functions were given by the table in Figure \ref{tab:aussagen-logik} on page
+The definitions of these functions have been given by the table in Figure \ref{tab:aussagen-logik} on page
 \pageref{tab:aussagen-logik}.
 
 \begin{Definition}[Semantics of $\Sigma$-formulas]
-    Let $\struct$ be a $\Sigma$-structure and $\mathcal{I}$ a $\struct$-variable assignment.  
-    We define for each $\Sigma$-formula $F$ the value \blue{$\struct(\mathcal{I},F)$}
+    Let $\struct = \langle \mathcal{U}, \mathcal{J} \rangle$ be a $\Sigma$-structure and $\mathcal{I}$ a $\struct$-variable assignment.  
+    For each $\Sigma$-formula $F$ the value \blue{$\struct(\mathcal{I},F)$} is defined
     by induction:
     \begin{enumerate}
     \item $\struct(\mathcal{I},\verum) := \mathtt{True}$ and $\struct(\mathcal{I},\falsum) := \mathtt{False}$.
+    \item If $p$ is a propositional variable, then we define the value of $p$ as follows:
+          \\[0.2cm]
+          \hspace*{1.3cm}
+          $\mathcal{S}(\mathcal{I}, p) := p^\mathcal{J}$.
+    \item For each atomic $\Sigma$-formula of the form $p(t_1, \cdots, t_n)$ we define the value  as follows: \\[0.2cm]
+          \hspace*{1.3cm}
+          $\struct\bigl(\mathcal{I}, p(t_1,\cdots,t_n)\bigr) := 
+          \Bigl(\bigl\langle \struct(\mathcal{I}, t_1), \cdots, \struct(\mathcal{I}, t_n) \bigr\rangle \in p^\mathcal{J}\Bigr)$.
     \item $\struct(\mathcal{I}, \neg F) := \circneg\bigl(\struct(\mathcal{I}, F)\bigr)$.
     \item $\struct(\mathcal{I}, F \wedge G) := \circwedge\bigl(\struct(\mathcal{I}, F), \struct(\mathcal{I}, G)\bigr)$.
     \item $\struct(\mathcal{I}, F \vee G) := \circvee\bigl(\struct(\mathcal{I}, F), \struct(\mathcal{I}, G)\bigr)$.
@@ -507,10 +620,10 @@ Continuing from the above example, we have \\[0.2cm]
 
 If $F$ is a formula such that $\FV(F) = \{\}$, then the value $\struct(\mathcal{I}, F)$ 
 obviously does not depend on the interpretation $\mathcal{I}$. We also refer to such formulas as 
-\blue{closed} formulas.\index{closed formula} In this case, we write more succinctly $\struct(F)$
+\blue{closed} formulas.\index{closed formula} In this case, we write $\struct(F)$
 instead of $\struct(\mathcal{I}, F)$. If additionally $\struct(F) = \mathtt{True}$, 
 we also say that $\struct$ is a \blue{model} \index{model} of $F$.
-In this case we write \\[0.2cm]
+This is written as \\[0.2cm]
 \hspace*{1.3cm} $\mathcal{S} \models F$. \index{$\mathcal{S} \models F$}
 \vspace{0.1cm}
 
@@ -533,7 +646,10 @@ $\Sigma$-formulas, and $\Sigma$-structures.
   \hspace*{1.3cm}
   $\models F \leftrightarrow G$
   \\[0.2cm]
-  holds.
+  holds.  If $F$ and $G$ are equivalent, then this will be written as
+  \\[0.2cm]
+  \hspace*{1.3cm}
+  $F \;\Leftrightarrow\; G$.
   \eox
 \end{Definition}
 
@@ -549,7 +665,7 @@ All propositional logic equivalences are also first-order logic equivalences.
     $\struct(\mathcal{I},F) = \mathtt{True}$ \quad for all $F \in M$ 
     \\[0.2cm]
     holds. Otherwise, $M$ is called \blue{unsatisfiable} or \blue{contradictory}.\index{contradictory}
-    We also write \\[0.2cm]
+    This is written as \\[0.2cm]
     \hspace*{1.3cm} $M \models \falsum$ \index{$M \models \falsum$}
     \eox
 \end{Definition}
@@ -559,7 +675,8 @@ Our goal is to provide a method that allows us to check
 whether a set $M$ of formulas is \blue{contradictory}, i.e., whether 
 $M \models \falsum$ holds. It turns out that this is generally not
 possible; the question of whether $M \models \falsum$ holds is \red{undecidable}. A proof
-of this fact is beyond the scope of this lecture.
+of this fact is based on the unsolvability of the halting problem but the details are beyond the scope of
+this lecture. 
 However, as in propositional logic, it is possible
 to specify a \blue{calculus} $\vdash$ such that: \\[0.2cm]
 \hspace*{1.3cm} $M \vdash \falsum$ \quad iff \quad $M \models \falsum$. \\[0.2cm]
@@ -638,35 +755,35 @@ We proceed in four steps:
 In mathematics, a group $\mathcal{G}$ \index{Group} is defined as a triple of the form
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathcal{G} = \langle G, \mathrm{e}, * \rangle$
+$\mathcal{G} = \langle G, \mathrm{e}, \circ \rangle$
 \\[0.2cm]
 where:
 \begin{enumerate}
 \item $G$ is a set,
 \item $\mathrm{e}$ is an element of the set $G$, and
-\item $*: G \times G \rightarrow G$ is a binary function on $G$, which we henceforth refer to as the
+\item $\circ: G \times G \rightarrow G$ is a binary function on $G$, which we henceforth refer to as the
       \textcolor{blue}{multiplication} of the group.
 \item Moreover, the following three axioms hold:
       \begin{enumerate}
-      \item $\forall x: \mathrm{e} * x = x$,
+      \item $\forall x: \mathrm{e} \circ x = x$,
         
             $\mathrm{e}$ is a \textcolor{blue}{left-neutral} element with respect to multiplication.
-      \item $\forall x: \exists{y}: y * x = \mathrm{e}$,
+      \item $\forall x: \exists{y}: y \circ x = \mathrm{e}$
 
-            i.e., for every $x \in G$ there is a \textcolor{blue}{left-inverse} element.
-      \item $\forall x: \forall y: \forall z: (x * y) * z = x * (y * z)$,
+            for every $x \in G$ there is a \textcolor{blue}{left-inverse} element.
+      \item $\forall x: \forall y: \forall z: (x \circ y) \circ z = x \circ (y \circ z)$
 
-            i.e., the \textcolor{blue}{associative law} holds.
+            the operator $\circ$ is \blue{associative}.
 
       \item The group $\mathcal{G}$ is a \textcolor{blue}{commutative} group if and only if additionally the
             following axiom holds: 
         
-            $\forall x: \forall y: x * y = y * x$,
+            $\forall x: \forall y: x \circ y = y \circ x$
 
-            This is know as the law of commutativity.
+            This is know as the law of \blue{commutativity}.
             \eox
       \end{enumerate}
-      Note that the commutative law does not have to hold in a group.  It is only required for
+      Note that the law of commutativity does not have to hold in a group.  It is only required for
       \blue{commutative groups}. 
 \end{enumerate}
 
@@ -676,14 +793,14 @@ group theory as follows:
 \\[0.2cm]
 \hspace*{1.3cm}
 $\Sigma_G = 
-   \bigl\langle \{x,y,z\},\; \{\mathrm{e},*\},\; \{=\},\; \{ \pair(\mathrm{e},0), \pair(*,2), \pair(=,2) \} \bigr\rangle 
+   \bigl\langle \{x,y,z\},\; \{\mathrm{e},\circ\},\; \{=\},\; \{ \pair(\mathrm{e},0), \pair(\circ,2), \pair(=,2) \} \bigr\rangle 
 $.
 \\[0.2cm]
-Here, ``$\mathrm{e}$'' is a 0-arity function symbol representing the identity element, ``$*$'' is
+Here, ``$\mathrm{e}$'' is a 0-arity function symbol representing the identity element, ``$\circ$'' is
 the binary function symbol representing the group multiplication, and ``$=$'' is the binary predicate symbol to 
 denote equality. 
 We will use a parser for first-order logic formulas that does not support binary infix operators like
-``$*$'' or ``$=$''. With this parser, terms can only be specified in the form
+``$\circ$'' or ``$=$''. With this parser, terms can only be written in prefix form, i.e. as
 \\[0.2cm]
 \hspace*{1.3cm}
 $f(t_1,\cdots,t_n)$
@@ -694,13 +811,16 @@ represented by expressions in the form
 \hspace*{1.3cm}
 $p(t_1,\cdots,t_n)$
 \\[0.2cm]
-where $p$ is a predicate symbol. Variables are distinguished from function and predicate symbols
-in that variables begin with a lowercase letter, while function and
-predicate symbols begin with an uppercase letter. To be able to represent the formulas of group theory, we therefore agree on the following:
+where $p$ is a predicate symbol.  Variables are distinguished from function and predicate symbols
+by the fact that variables begin with a lowercase letter, while function and
+predicate symbols begin with an uppercase letter. To be able to represent the formulas of group theory, we
+therefore agree on the following: 
 \begin{enumerate}
-\item The neutral element $\mathrm{e}$ is written as $\mytt{E}()$.  
-\item For the operator $*$, we use the binary function symbol $\mytt{Multiply}$.
-      Thus, the expression $x*y$ is written as $\mytt{Multiply}(x, y)$.
+\item The neutral element $\mathrm{e}$ is written as $\mytt{E}()$.
+
+      The parser we use requires that  a constant is followed by parentheses.
+\item For the operator $\circ$, we use the binary function symbol $\mytt{Multiply}$.
+      Thus, the expression $x \circ y$ is written as $\mytt{Multiply}(x, y)$.
 \item The equality sign ``$=$'' is represented by the binary predicate symbol
       $\mytt{Equals}$. Thus, for example, the formula $x = y$ is written as $\mytt{Equals}(x, y)$.
 \end{enumerate}
@@ -1109,30 +1229,32 @@ The  script shown in Figure \ref{fig:isGroup.ipynb} can check whether the $\Sigm
 \noindent
 \textbf{Remark}: The program shown above is available as a Jupyter Notebook on GitHub at the address:
 \\[0.2cm]
-\hspace*{-1.0cm}
-\href{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/01-FOL-Evaluation.ipynb}{\mytt{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/01-FOL-Evaluation.ipynb}}
+\hspace*{0.0cm}
+\href{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/01-FOL-Evaluation.ipynb}{\mytt{github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/01-FOL-Evaluation.ipynb}}
 \\[0.2cm]
-With this program, we can check whether a
+With this program we can check, whether a
 first-order formula is satisfied in a given finite structure. However, we cannot use it to check whether a
 formula is universally valid because, on one hand, we cannot apply the program if the $\Sigma$-structure has an
 infinite universe, and on the other hand, even the number of different finite $\Sigma$-structures we would need
 to test is infinitely large. \eox 
 
 \exerciseEng
-\begin{enumerate}
-\item Show that the formula
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      $\forall x: \exists y: p(x,y) \rightarrow \exists y: \forall x: p(x,y)$
-      \\[0.2cm]
-      is \underline{not} universally valid.
+In the following exercises, you are given a number of different closed $\Sigma$-formulas $F$. For each of these
+formulas $F$ your task is to show that $F$ is \underline{not} universally valid.  In order to do so,
+you have to construct a $\Sigma$-structure $\mathcal{S}$ such that $\mathcal{S}(F) = \mathtt{False}$.
+\begin{enumerate}[(a)]
+\item $\forall x: \exists y: p(x,y) \rightarrow \exists y: \forall x: p(x,y)$
+\item $\forall x: \bigl(p(x) \lor q(x)\bigr) \rightarrow \bigl(\forall x: p(x) \lor \forall x: q(x)\bigr)$
+\item $\bigl(\exists x: p(x) \land \exists x: q(x)\bigr) \rightarrow \exists x: \bigl(p(x) \land q(x)\bigr)$
+\item $\exists x: \bigl(p(x) \rightarrow q(x)\bigr) \rightarrow \exists x: p(x) \rightarrow \exists x: q(x)$
+\end{enumerate}
+In each of these cases you should use the program shown previously in order to verify your claim
+that $\mathcal{S}(F) = \mathtt{False}$.
 
-      In order to do this, implement a suitable $\Sigma$-structure $\mathcal{S}$ in \textsl{Python}
-      such that this formula is false. 
-
-\item Consider how many different structures there are for the signature of group theory if we assume that the
+\exerciseEng
+\begin{enumerate}[(a)]
+\item How many different structures exist for the signature of group theory if we assume that the
       universe is of the form $\{1, \cdots, n\}$.
-
 \item Provide a \underline{satisfiable} first-order formula $F$ that is always false in a 
       $\Sigma$-structure $\mathcal{S} = \pair(\mathcal{U},\mathcal{J})$ if  the universe $\mathcal{U}$ is finite.
 
@@ -1149,7 +1271,7 @@ in order to solve a given problem, this problem is \blue{specified} and this \bl
 given as input to a problem solver which will then compute a solution to the problem.  Hence, the task of the
 programmer is much easier than it normally is: Instead of \blue{implementing} a program that solves a given problem,
 the programmer only has to \blue{specify} the problem precisely, she does not have to explicitely code an algorithm to find the
-solution.  Usually, the specification of a problem is much easier than the coding of an algorithm to solve the problem.  This approach works well for those problems
+solution.  Usually, the specification of a problem is much easier than the coding of an algorithm to solve the problem.  This approach works well for some problems
 that can be specified using first order logic.  The remainder of this section is structured as follows:
 \begin{enumerate}
 \item We first define \blue{constraint satisfaction problems} and provide two examples:
@@ -1160,8 +1282,10 @@ that can be specified using first order logic.  The remainder of this section is
 \item We discuss a simple constraint solver that is based on \blue{backtracking}.
 
       More efficient constraint solvers will be discussed in the lecture on artificial intelligence in the
-      $6^{\mathrm{th}}$ semester.
-\item Then we show how some puzzles can be solved using constraint programming.
+      $6^{\mathrm{th}}$ semester.  Furthermore, later in this chapter we will introduce
+      \href{https://www.microsoft.com/en-us/research/project/z3-3/}{Z3}, which is a very powerful
+      constraint solver developed by Microsoft.
+\item Finally, we demonstrate a number of puzzles that can be solved using constraint programming.
 \end{enumerate}
 
 \subsection{Constraint Satisfaction Problems}
@@ -1169,60 +1293,64 @@ Conceptually, a constraint satisfaction problem is given by a set of first order
 set of free variables.  Furthermore, a $\Sigma$-structure $\mathcal{S} = \langle \mathcal{U},
 \mathcal{J}\rangle $
 consisting of a universe $\mathcal{U}$ and the interpretation $\mathcal{J}$ of the function and predicate 
-symbols used in these formulas is assumed to be implicitly specified by the context of the problem.  The goal is 
-to find a variable assignment such that the given first-order formulas are evaluated as true.
+symbols used in these formulas is assumed to be specified by the context of the problem.  The goal is 
+to find a variable assignment such that the given first-order formulas are evaluated as true.  The formal
+definition follows.
 
 \begin{Definition}[CSP] \index{CSP} \hspace*{\fill} \linebreak
-Formally, a \blue{constraint satisfaction problem} \index{constraint satisfaction problem} (abbreviated as
-\textsc{Csp}) is defined as a triple 
+A \blue{constraint satisfaction problem} \index{constraint satisfaction problem} (abbreviated as
+\textsc{Csp}) is defined as a triple
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathcal{P} := \langle \mathtt{Vars}, \mathtt{Values}, \mathtt{Constraints} \rangle$
+$\mathbb{P} := \langle \Sigma, \mathcal{S}, \mathcal{C} \rangle$
 \\[0.2cm]
 where
 \begin{enumerate}
-\item $\mathtt{Vars}$ is a set of strings which serve as \blue{variables},
-\item $\mathtt{Values}$ is a set of \blue{values} that can be assigned to the variables in $\mathtt{Vars}$.
-
-      This set of values is assumed to be identical to the universe of the $\Sigma$-structure
-      $\mathcal{S} = \langle \mathcal{U}, \mathcal{J} \rangle$ that is given implicitly, i.e.~we have
-      \\[0.2cm]
-      \hspace*{1.3cm}
-      $\mytt{Values} = \mathcal{U}$.
-\item $\mathtt{Constraints}$ is a set of formulas from \blue{first order logic}.  Each of these formulas is
-      called a \blue{constraint} of $\mathcal{P}$.  \eox
+\item $\Sigma = \langle \mathcal{V}, \mathcal{F}, \mathcal{P}, \textsl{arity} \rangle$ is signature,
+\item $\mathcal{S} = \langle \mathcal{U}, \mathcal{J} \rangle$ is $\Sigma$-structure,
+\item $\mathcal{C} \subseteq \mathbb{F}_\Sigma$, i.e.~$\mathcal{C}$ is a set of $\Sigma$-formulas from
+      \blue{first order logic}.  These formulas are called the \blue{constraints}\index{constraints} of $\mathbb{P}$.  \eox
 \end{enumerate}
 \end{Definition}
 \vspace*{-0.3cm}
 
-\noindent
+In the following, we will often specify a constraint satisfaction problem by just specifying the variables
+$\mathcal{V}$,  the set of values $\mathcal{U}$ that these variables can take, and the set $\mathcal{C}$ of
+constraints.  In this case, we assume that the sets $\mathcal{F}$ and $\mathcal{P}$ of function and predicate
+symbols and their interpretation $\mathcal{J}$ are implicitly given.  In this case the constraint satisfaction
+problem is given as the triple 
+\\[0.2cm]
+\hspace*{1.3cm}
+$\mathbb{P} = \langle \mathcal{V}, \mathcal{U}, \mathcal{C} \rangle$.
+\\[0.2cm]
 Given a \textsc{Csp}
 \\[0.2cm]
 \hspace*{1.3cm}
- $\mathcal{P} = \langle \mathtt{Vars}, \mathtt{Values}, \mathtt{Constraints} \rangle$, 
+ $\mathbb{P} = \langle \mathcal{V}, \mathcal{U}, \mathcal{C} \rangle$, 
 \\[0.2cm]
-a \blue{variable assignment} for $\mathcal{P}$ is a function
-\\[0.2cm]
-\hspace*{1.3cm}
-$\mathcal{I}: \mathtt{Vars} \rightarrow \mathtt{Values}$.
-\\[0.2cm]
-A variable assignment $\mathcal{I}$ is a \blue{solution} of the \textsc{Csp} $\mathcal{P}$ \index{solution of a \textsc{Csp}}
-if, given the assignment $\mathcal{I}$, all constraints of $\mathcal{P}$ are satisfied, i.e.~we have
+a \blue{variable assignment} for $\mathbb{P}$ is a function
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathcal{S}(\mathcal{I}, f) = \mathtt{True}$ \quad for all $f \in \mathtt{Constraints}$.
+$\mathcal{I}: \mathcal{V} \rightarrow \mathcal{U}$.
+\\[0.2cm]
+A variable assignment $\mathcal{I}$ is a \blue{solution} of the \textsc{Csp}
+$\mathbb{P}= \langle \mathcal{V}, \mathcal{U}, \mathcal{C} \rangle$ \index{solution of a \textsc{Csp}}
+if, given the assignment $\mathcal{I}$, all constraints from $\mathcal{C}$ are satisfied, i.e.~we have
+\\[0.2cm]
+\hspace*{1.3cm}
+$\mathcal{S}(\mathcal{I}, f) = \mathtt{True}$ \quad for all $f \in \mathcal{C}$.
 \\[0.2cm]
 Finally, a \blue{partial variable assignment} \index{partial variable assignment} $\mathcal{B}$ for $\mathcal{P}$ is a function
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathcal{B}: \mathtt{Vars} \rightarrow \mathtt{Values} \cup \{ \Omega \}$ \quad where $\Omega$ denotes the undefined value.
+$\mathcal{B}: \mathcal{V} \rightarrow \mathcal{U} \cup \{ \Omega \}$ \quad where $\Omega$ denotes the undefined value.
 \\[0.2cm]
 Hence, a partial variable assignment does not assign values to all variables.  Instead, it assigns values only
-to a subset of the set $\mathtt{Vars}$.  The \blue{domain} $\mathtt{dom}(\mathcal{B})$ \index{domain} of a partial variable assignment $\mathcal{B}$ is the
+to a subset of the set $\mathcal{V}$.  The \blue{domain} $\mathtt{dom}(\mathcal{B})$ \index{domain} of a partial variable assignment $\mathcal{B}$ is the
 set of those variables that are assigned a value different from $\Omega$, i.e.~we define
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathtt{dom}(\mathcal{B}) := \bigl\{ x \in \mathtt{Vars} \mid \mathcal{B}(x) \not= \Omega \bigr\}$.
+$\mathtt{dom}(\mathcal{B}) := \bigl\{ x \in \mathcal{V} \mid \mathcal{B}(x) \not= \Omega \bigr\}$.
 \\[0.2cm]
 We proceed to illustrate the definitions given so far by presenting two examples.
 
@@ -1256,14 +1384,13 @@ available.  The question then is whether it is
 possible to colour the different states in a way that no two neighbouring states share the same colour.  This
 problem can be formalized as a constraint satisfaction problem.  To this end we define:
 \begin{enumerate}
-\item $\mytt{Vars} := \{ \mathtt{WA}, \mathtt{NT}, \mathtt{SA}, \mathtt{Q}, \mathtt{NSW}, \mathtt{V}, \mathtt{T} \}$,
-\item $\mytt{Values} := \{ \mytt{red}, \mytt{green}, \mytt{blue} \}$,
-\item $\mytt{Constraints} := $ \\[0.1cm]
-      \hspace*{1.3cm}
-      $\bigl\{ \mathtt{WA} \not= \mathtt{NT}, \mathtt{WA} \not= \mathtt{SA},
-                 \mathtt{NT} \not= \mathtt{SA}, \mathtt{NT} \not= \mathtt{Q},
-                 \mathtt{SA} \not= \mathtt{Q},  \mathtt{SA} \not= \mathtt{NSW}, \mathtt{SA} \not= \mathtt{V}, 
-                 \mathtt{Q}  \not= \mathtt{NSW},
+\item $\mathcal{V} := \{ \mathtt{WA}, \mathtt{NT}, \mathtt{SA}, \mathtt{Q}, \mathtt{NSW}, \mathtt{V}, \mathtt{T} \}$,
+\item $\mathcal{U} := \{ \mytt{red}, \mytt{green}, \mytt{blue} \}$,
+\item $\mathcal{C} :=  
+      \bigl\{ \mathtt{WA} \not= \mathtt{NT},\;\mathtt{WA} \not= \mathtt{SA},
+                 \mathtt{NT} \not= \mathtt{SA},\;\mathtt{NT} \not= \mathtt{Q},
+                 \mathtt{SA} \not= \mathtt{Q},\; \mathtt{SA} \not= \mathtt{NSW},\;\mathtt{SA} \not= \mathtt{V},\;
+                 \mathtt{Q}  \not= \mathtt{NSW},\;
                  \mathtt{NSW}\not= \mathtt{V}
        \bigr\}
        $.
@@ -1271,7 +1398,7 @@ problem can be formalized as a constraint satisfaction problem.  To this end we 
        The constraints do not mention the variable \texttt{T} for Tasmania, as Tasmania does not share a common
        border with any of the other states.
 \end{enumerate}
-Then $\mathcal{P} := \langle \mytt{Vars}, \mytt{Values}, \mytt{Constraints} \rangle$ is a constraint satisfaction problem.  
+Then $\mathbb{P} := \langle \mathcal{V}, \mathcal{U}, \mathcal{C} \rangle$ is a constraint satisfaction problem.  
 If we define the assignment $\mathcal{I}$ such that
 \begin{enumerate}
 \item $\mathcal{I}(\mathtt{WA}) = \mytt{red}$,
@@ -1306,13 +1433,13 @@ than 8 queens on the board.  Therefore, in order to model the eight queens probl
 problem, we will use the following set of variables:
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mytt{Vars} := \{ \mytt{Q}_1, \mytt{Q}_2, \mytt{Q}_3, \mytt{Q}_4, \mytt{Q}_5, \mytt{Q}_6, \mytt{Q}_7,\mytt{Q}_8 \}$,
+$\mathcal{V} := \{ \mytt{Q}_1, \mytt{Q}_2, \mytt{Q}_3, \mytt{Q}_4, \mytt{Q}_5, \mytt{Q}_6, \mytt{Q}_7,\mytt{Q}_8 \}$,
 \\[0.2cm]
 where for $i \in \{1,\cdots,8\}$ the variable $\mytt{Q}_i$ specifies the column of the queen that is placed in
-row $i$.   As the columns run from one to eight, we define the set $\mytt{Values}$ as
+row $i$.   As the columns run from one to eight, we define the set $\mathcal{U}$ as
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mytt{Values} := \{1,2,3,4,5,6,7,8\}$.
+$\mathcal{U} := \{1,2,3,4,5,6,7,8\}$.
 \\[0.2cm]
 Next, let us define the constraints.  There are two different types of constraints.
 \begin{enumerate}
@@ -1320,7 +1447,7 @@ Next, let us define the constraints.  There are two different types of constrain
       To capture these constraints, we define
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\mytt{SameColumn} := \bigl\{ \mytt{Q}_i \not= \mytt{Q}_j \bigm| i \in \{1,\cdots,8\} \wedge j \in \{1,\cdots,8\} \wedge j < i \bigr\}$.
+      $\mytt{SameColumn} := \bigl\{ \mytt{Q}_i \not= \mytt{Q}_j \bigm| i,j \in \{1,\cdots,8\} \wedge j < i \bigr\}$.
       \\[0.2cm]
       Here the condition $i < j$ ensures that, for example, we have the constraint $\mytt{Q}_2 \not= \mytt{Q}_1$
       but not the constraint  $\mytt{Q}_1 \not= \mytt{Q}_2$, as the latter constraint would be redundant if
@@ -1336,17 +1463,17 @@ Next, let us define the constraints.  There are two different types of constrain
       columns of these queens.  To capture these constraints, we define
       \\[0.2cm]
       \hspace*{1.3cm}
-      $\mytt{SameDiagonal} := \bigl\{ |i  - j| \not= |\mytt{Q}_i - \mytt{Q}_j| \bigm| i \in \{1,\cdots,8\} \wedge j \in \{1,\cdots,8\} \wedge j < i \bigr\}$.
+      $\mytt{SameDiagonal} := \bigl\{ |i  - j| \not= |\mytt{Q}_i - \mytt{Q}_j| \bigm| i,j \in \{1,\cdots,8\} \wedge j < i \bigr\}$.
 \end{enumerate}
 Then, the set of constraints is defined as 
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mytt{Constraints} := \mytt{SameColumn} \cup \mytt{SameDiagonal}$
+$\mathcal{C} := \mytt{SameColumn} \cup \mytt{SameDiagonal}$
 \\[0.2cm]
 and the eight queens problem can be stated as the constraint satisfaction problem
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mathcal{P} := \langle \mytt{Vars}, \mytt{Values}, \mytt{Constraints} \rangle$.
+$\mathbb{P} := \langle \mathcal{V}, \mathcal{U}, \mathcal{C} \rangle$.
 \\[0.2cm]
 If we define the assignment $\mathcal{I}$ such that
 \\[0.2cm]
@@ -1383,7 +1510,7 @@ in \myFig{eight-queens.txt}.
 \end{figure}
 Later, when we implement procedures to solve  \textsc{Csp}s, we will represent variable assignments and partial
 variable assignments as dictionaries.  For example, the variable assignment $\mathcal{I}$ defined above would
-then be represented as the dictionary 
+then be represented in \textsl{Python} as the dictionary 
 \\[0.2cm]
 \hspace*{1.3cm}
 $\mathcal{I} = \bigl\{ \mytt{Q}_1:4,\, \mytt{Q}_2:8,\, \mytt{Q}_3:1,\, \mytt{Q}_4:3,\, 
@@ -1641,9 +1768,9 @@ assignment that satisfies all constraints of the given $\mytt{CSP}$.
 
 We still need to discuss the implementation of the auxiliary procedure $\mytt{isConsistent}$
 shown in \myFig{CSP-Solver.ipynb-isConsistent}.  This procedure takes a variable $\mytt{var}$, a $\mytt{value}$, a partial 
-$\mytt{Assignment}$ and a set of $\mytt{Constraints}$.  It is assumed that $\mytt{Assignment}$ is
-\blue{partially consistent} with respect to the set $\mytt{Constraints}$, i.e.~for every formula $\mytt{f}$
-occurring in $\mytt{Constraints}$ such that
+$\mytt{Assignment}$ and a set of constraints \texttt{Constraints}.  It is assumed that $\mytt{Assignment}$ is
+\blue{partially consistent} with respect to the set $\mathtt{Constraints}$, i.e.~for every formula $\mytt{f}$
+occurring in $\mathtt{Constraints}$ such that
 \\[0.2cm]
 \hspace*{1.3cm}
 $\mytt{vars}(\mytt{f}) \subseteq \mytt{dom}(\mytt{Assignment})$
@@ -1654,22 +1781,23 @@ $\mytt{isConsistent}$ is to check, whether the extended assignment
 \hspace*{1.3cm}
 $\mytt{NewAssign} \;\mytt{:=}\;\mytt{Assignment} \cup \{ \pair(\mytt{var}, \mytt{value}) \}$
 \\[0.2cm]
-that assigns $\mytt{value}$ to the variable $\mytt{var}$ is still partially consistent with $\mytt{Constraints}$. 
-To this end, the \mytt{for}-loop iterates over all $\mytt{Formula}$s in $\mytt{Constraints}$. 
+that assigns $\mytt{value}$ to the variable $\mytt{var}$ is still partially consistent with $\mathcal{C}$. 
+To this end, the \mytt{for}-loop iterates over all $\mytt{Formula}$s in $\mathcal{C}$. 
 However, we only have to check those $\mytt{Formula}$s that contain the variable $\mytt{var}$ and,
 furthermore, have the property that
 \\[0.2cm]
 \hspace*{1.3cm}
-$\mytt{Vars}(\mytt{Formula}) \subseteq \mytt{dom}(\mytt{NewAssign})$,
+$\mathcal{V}(\mytt{Formula}) \subseteq \mytt{dom}(\mytt{NewAssign})$,
 \\[0.2cm]
 i.e.~all variables occurring in $\mytt{Formula}$ need to have a value assigned in
 $\mytt{NewAssign}$.  The reasoning is as follows:
 \begin{enumerate}
 \item If $\mytt{var}$ does not occur in $\mytt{Formula}$, then adding $\mytt{var}$ to
-      $\mytt{Assignment}$ cannot change the result of evaluating $\mytt{Formula}$ and as
+      $\mytt{Assignment}$ cannot change the result of evaluating $\mytt{Formula}$: As
       $\mytt{Assignment}$ is assumed to be partially consistent with respect to $\mytt{Formula}$, 
       $\mytt{NewAssign}$ is also partially consistent with respect to $\mytt{Formula}$.
-\item If $\mytt{dom}(\mytt{NewAssign}) \not\subseteq \mytt{Vars}(\mytt{Formula})$, then $\mytt{Formula}$ can not be evaluated anyway. 
+\item If the formula $\mathtt{f}$ contains variables that have not been assigned yet, then \texttt{f} can not
+      be evaluated anyway.
 \end{enumerate}
 If we use backtracking, we can solve the 8 queens puzzle in less than a second.
 For the 8 queens puzzle the order in which variables are tried is not particularly important.  The reason
@@ -1742,26 +1870,26 @@ In order to solve this problem via constraint programming, we first introduce th
   A symbolic transition system is a 6-tuple
   \\[0.2cm]
   \hspace*{1.3cm}
-  $\mathcal{T} = \langle \mathtt{Vars}, \mathtt{Values}, \mathtt{Start}, \mathtt{Goal}, \mathtt{Invariant}, \mathtt{Transition} \rangle$
+  $\mathcal{T} = \langle \mathcal{V}, \mathcal{U}, \mathtt{Start}, \mathtt{Goal}, \mathtt{Invariant}, \mathtt{Transition} \rangle$
   \\[0.2cm]
   such that:
   \begin{enumerate}[(a)]
-  \item \texttt{Vars} is a set of variables.
+  \item $\mathcal{V}$ is a set of variables.
 
-        These variables are strings.  For every variable $x \in \texttt{Vars}$ there is a \blue{primed}
-        variable $x'$ which does not occur in \texttt{Vars}.  The set of these primed Variables is denoted as
-        $\mathtt{Vars}'$.
-  \item \texttt{Values} is a set of values that these variables can take.
+        These variables are strings.  For every variable $x \in \mathcal{V}$ there is a \blue{primed}
+        variable $x'$ which does not occur in $\mathcal{V}$.  The set of these primed variables is denoted as
+        $\mathcal{V}'$.
+  \item $\mathcal{U}$ is a set of values that these variables can take.
   \item \texttt{Start}, \texttt{Goal}, and \texttt{Invariant} are first-order formulas such that all free
-         variables occurring in these formulas are elements from the set \texttt{Vars}.
+         variables occurring in these formulas are elements from the set $\mathcal{V}$.
          \begin{itemize}
          \item \texttt{Start} describes the initial state of the transition system.
          \item \texttt{Goal} describes a state that should be reached by the transition system.
          \item \texttt{Invariant} is a formula that has to be true for every state of the transition system.
          \end{itemize}
   \item \texttt{Transition} is a first-order formula.  The free variables of this formula are elements of
-        the set $\texttt{Vars} \cup \mathtt{Vars}'$, i.e.~they are either variables from the set \texttt{Vars}
-        or they are primed variables from the set $\mathtt{Vars}'$.
+        the set $\mathcal{V} \cup \mathcal{V}'$, i.e.~they are either variables from the set $\mathcal{V}$
+        or they are primed variables from the set $\mathcal{V}'$.
 
         The formula \texttt{Transition} describes how the variables in the transition system change during a
         state transition.  The primed variables refer to the values of the original variables after the
@@ -1777,17 +1905,22 @@ and that has to remain true after every transition of our system.
 In order to clarify this definition we show how the \emph{missionaries and cannibals} problem can be formulated as
 a symbolic transition system.
 \begin{enumerate}[(a)]
-\item $\texttt{Vars} := \{ \mathtt{M}, \mathtt{C}, \mathtt{B} \}$.
+\item $\mathcal{V} := \{ \mathtt{M}, \mathtt{C}, \mathtt{B} \}$.
 
       The value of \texttt{M} is the number of missionaries on the western shore, the value of \texttt{C} is
       the number of infidels on that shore, while the value of \texttt{B} is the number of boats on the western
       shore.
-\item $\mathtt{Values} := \{ 0, 1, 2, 3 \}$.
+\item $\mathcal{U} := \{ 0, 1, 2, 3 \}$.
 \item $\texttt{Start} := (\mathtt{M} = 3 \wedge \mathtt{C} = 3 \wedge \mathtt{B} = 1)$.
+
+      At the beginning, there are 3 missionaries, 3 infidels, and 1 boat on the western shore.
 \item $\texttt{Goal}  := (\mathtt{M} = 0 \wedge \mathtt{C} = 0 \wedge B = 0)$.
+
+      The goal is to transfer everybody to the eastern shore.  If the goal is reached, the number of
+      missionaries, infidels, and boats on the western shore will be $0$.
 \item $\texttt{Invariant} := \bigl((\mathtt{M} = 3 \vee \mathtt{M} = 0 \vee \mathtt{M} = \mathtt{C}) \;\wedge\; \mathtt{B} \leq 1\bigr)$.
 
-      The first part of the invariant, i.e.~ the formulas $\mathtt{M} = 3 \vee \mathtt{M} = 0 \vee \mathtt{M} = \mathtt{C}$,
+      The first part of the invariant, i.e.~the formulas $\mathtt{M} = 3 \vee \mathtt{M} = 0 \vee \mathtt{M} = \mathtt{C}$,
       describes those states where the missionaries are not threatened by the infidels.
       \begin{itemize}
       \item $\mathtt{M} = 3$: All missionaries are on the western shore.
@@ -1795,11 +1928,12 @@ a symbolic transition system.
       \item $\mathtt{M} = \mathtt{C}$: On both shores the numbers of missionaries and cannibals are the same.
 
             If neither $\mathtt{M} = 3$ nor $\mathtt{M} = 0$ holds, then the number of missionaries and
-            cannibals have to be the same on the western shorem because if there were more missionaries on the
-            western shore than cannibals, then there would be less missionaries than cannibals on the eastern
-            shore and hence there would be a problem on the eastern shore.
+            cannibals have to be the same on the western shore, because if, for example, there were more
+            missionaries on the western shore than cannibals, then there would be less missionaries than
+            cannibals on the eastern shore and hence there would be a problem.
       \end{itemize}
-      The condition $\mathtt{B} \leq 1$ has to be true because there is just one boat.
+      The condition $\mathtt{B} \leq 1$ is needed because there is just one boat, but the set $\mathcal{U}$ of
+      values also includes the numbers $2$ and $3$.
 \item $\texttt{Transition} :=
       \begin{array}[t]{cl}
          &  \mathtt{B}' = 1 - \mathtt{B}   \\[0.2cm]
@@ -1881,7 +2015,7 @@ Figure \ref{fig:Missionaries-STS.ipynb} shows how the \emph{missionaries and can
 represented as a symbolic transition system in \textsl{Python}.  In the function \texttt{transition} 
 we use the following convention: Since variables cannot be primed in
 \textsl{Python} we append the character $\alpha$ to the names of the original
-variables from the set \texttt{Vars}, while we append $\beta$ to these names to get the primed versions of the
+variables from the set $\mathcal{V}$, while we append $\beta$ to these names to get the primed versions of the
 corresponding variable.
 
 
@@ -1942,9 +2076,9 @@ Figure \ref{fig:Missionaries-STS.ipynb-2} shows how we can turn the symbolic tra
        \hspace*{1.3cm}
        $L_1 + \cdots + L_k$,
        \\[0.2cm]
-       i.e.~it appends these lists and returns the result.
+       i.e.~it concatenates the lists that are elements of \texttt{Lol} and returns the resulting list.
 \item The function $\mathtt{missionaries\_CSP}(n)$ receives a natural number $n$ as its argument.
-       It returns a \textsc{Csp} that has a solution if there is a solution of the \emph{missionaries and cannibals}
+       It returns a \textsc{Csp} that has a solution iff there is a solution of the \emph{missionaries and cannibals}
        problem that crosses the river exactly $n$ times.  It uses the variables
        \\[0.2cm]
        \hspace*{1.3cm}
@@ -1960,9 +2094,8 @@ Figure \ref{fig:Missionaries-STS.ipynb-2} shows how we can turn the symbolic tra
        with $n$ crossings. As the number of crossings has to be odd, we increment $n$ by
        two at the end of the \texttt{while} loop.
 
-       The function \texttt{find\_solution} needs less than 2 seconds to finc the solution.
+       The function \texttt{find\_solution} needs less than 2 seconds to find the solution.
 \end{enumerate}
-\pagebreak
 
 \exerciseEng
 An agricultural economist has to sell a \blue{wolf}, a \blue{goat}, and a \blue{cabbage}
@@ -1993,9 +2126,9 @@ You should start from the following notebook:
 \hspace*{-0.5cm}
 \href{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/Wolf-Goat-Cabbage-STS.ipynb}{\texttt{github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/Wolf-Goat-Cabbage-STS.ipynb}}
 \eox
-s
+
 \section{The Z3 Solver}
-We conclude this chapter with a discussion of the solver
+We proceed with a discussion of the solver
 \href{https://www.microsoft.com/en-us/research/project/z3-3/}{Z3}, which has beed developd
 at Microsoft.  Z3 implements most of the state-of-the-art constraint solving algorithms
 and is exceptionally powerful.  We introduce Z3 via a series of examples.
@@ -2018,11 +2151,11 @@ Strangely, in my old math book these assumptions have not been mentioned.
 
 We can now infer the number of children.
 If we denote the number of \blue{boys} by the variable $b$ and the number of \blue{girls}
-by the variable $g$, the problem statements are equivalent to the following equations:
-\begin{itemize}
-\item $b - 1 = g$.
-\item $2 \cdot (g - 1) = b$.
-\end{itemize}
+by the variable $g$, the problem statements are equivalent to the following two equations:
+\\[0.2cm]
+\hspace*{1.3cm}
+$b - 1 = g$ \quad and \quad $2 \cdot (g - 1) = b$.
+\\[0.2cm]
 Before we can start to solve this problem, we have to install \texttt{Z3} via \texttt{pip} using the following
 command:  
 \\[0.2cm]
@@ -2073,15 +2206,21 @@ interface of Z3.
       \\[0.2cm]
       \hspace*{1.3cm}
       \href{https://ericpony.github.io/z3py-tutorial/guide-examples.htm}{https://ericpony.github.io/z3py-tutorial/guide-examples.htm}
+      \\[0.2cm]
+      However, there is no need for you to consult this documentation as we will only use a very small part of
+      the \textsc{Api} of \texttt{Z3} in this lecture. 
 \item Lines 3 and 4 creates the \texttt{Z3} variables \mytt{boys} and \mytt{girls} as integer valued variables.
       The function \mytt{Int} takes one argument, which has to be a string.  This string is the name of the
       variable.  We store these variables in Python variables of the same name.  It would be possible to use
       different names for the Python variables, but that would be very confusing.
 \item Line 6 creates an object of the class \texttt{Solver}.  This is the constraint solver provided by
       \texttt{Z3}.
-\item Lines 8 and 9 add the constraints expressing that the number of girls is one less than the number of boys
-      and that my sister has twice as many brothers as she has sisters as constraints to the solver
-      \texttt{S}.
+    \item Lines 8 and 9 add the constraints expressing that
+      \begin{enumerate}[(a)]
+      \item the number of girls is one less than the number of boys \quad and 
+      \item that my sister has twice as many brothers as she has sisters 
+      \end{enumerate}
+      as constraints to the solver \texttt{S}.
 \item In line 10 the method \mytt{check} examines whether the given set of constraints is satisfiable.
       In general, this method returns one of the following results:
       \begin{enumerate}[(a)]
@@ -2097,7 +2236,6 @@ interface of Z3.
       rather as objects of the class \mytt{IntNumRef}, which is some internal class of \texttt{Z3} to store
       integers.  This class provides the method \mytt{as\_long} that converts its argument into an integer number.
 \end{enumerate}
-\pagebreak
 
 \exerciseEng
 Solve the following text problem using \texttt{Z3}.
@@ -2604,7 +2742,6 @@ Start with the following file:
 \hspace*{0.0cm}
 \href{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/Japanese-Z3.ipynb}{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-5/Japanese-Z3.ipynb}.
 \eox
-\pagebreak
 
 \exerciseEng
 The following puzzle offers a new twist to the river crossing puzzles encountered before, because we have to

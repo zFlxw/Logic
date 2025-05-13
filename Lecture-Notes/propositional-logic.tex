@@ -1565,6 +1565,12 @@ Calculate the conjunctive normal forms of the following formulae and state your 
 \end{enumerate}
 
 \section{The Concept of a Derivation}
+Logic is concerned with the validity of \blue{proofs}. In order to build an automatic theorem prover that can 
+help us with the verification of digital circuit or a program we need to investigate the concept of a proof.\index{proof}
+In mathematics, a proof is a conclusive argument that starts from given axioms and applies certain rules of
+derivation to these axioms in order to derive theorems.  Our aim is to formalize this process so that we are
+able to implement it. The formalized version of a proof will be called a \blue{derivation}.\index{derivation}
+
 If $\{f_1,\cdots,f_n\}$ is a set of formulas and $g$ is another formula, then
 we might ask whether the formula $g$ is a \textcolor{blue}{logical consequence} of the formulas $f_1$,
 $\cdots$, $f_n$, i.e.~whether
@@ -1607,12 +1613,15 @@ whether a formula follows from a given set of formulas. The idea of this method
 is to \textcolor{blue}{derive} the formula to be proved using \textcolor{blue}{inference rules} from the
 given formulas. The concept of an inference rule is based on the following definition. 
 \begin{Definition}[Inference Rule] \hspace*{\fill} \linebreak
-    A propositional \textcolor{blue}{inference rule} is a pair of the form  $\bigl\langle \langle f_1, f_2 \rangle, k \bigr\rangle$.
+    A propositional \textcolor{blue}{inference rule}\index{inference rule} is a pair of the form  
+    \\[0.2cm]
+    \hspace*{1.3cm}
+    $\bigl\langle \langle f_1, f_2 \rangle, k \bigr\rangle$.    
+    \\[0.2cm]
     Here, $\langle f_1, f_2 \rangle$ is a pair of propositional formulas, and $k$ is a
-    single propositional formula.  
-    The formulas $f_1$ and $f_2$ are referred to as
-    \textcolor{blue}{premises}, and the formula $k$ is called the \textcolor{blue}{conclusion} of the inference rule.
-    If the pair $\bigl\langle \langle f_1, f_2 \rangle, k \bigr\rangle$ is an inference rule, then this is written as: 
+    single propositional formula.   The formulas $f_1$ and $f_2$ are referred to as
+    \textcolor{blue}{premises}, and the formula $k$ is called the \textcolor{blue}{conclusion} of the inference
+    rule. If the pair $\bigl\langle \langle f_1, f_2 \rangle, k \bigr\rangle$ is an inference rule, then this is written as: 
     \\[0.3cm]
     \hspace*{1.3cm}      
     $\schluss{f_1 \qquad f_2}{k}$.
@@ -1628,7 +1637,7 @@ given formulas. The concept of an inference rule is based on the following defin
 \hspace*{1.3cm}            
 \begin{tabular}[t]{|c|c|c|}
 \hline
-\rule{0pt}{15pt} \href{https://en.wikipedia.org/wiki/Modus_ponens}{Modus Ponens} & \href{https://en.wikipedia.org/wiki/Modus_tollens}{Modus Tollens} & \textcolor{blue}{Nonsense} \\[0.3cm]
+\rule{0pt}{15pt} \href{https://en.wikipedia.org/wiki/Modus_ponens}{Modus Ponens} & \href{https://en.wikipedia.org/wiki/Modus_tollens}{Modus Tollens} & \textcolor{blue}{Denying the Antecedent} \\[0.3cm]
 \hline
 $
 \rule[-15pt]{0pt}{40pt}\schluss{f \quad\quad f \rightarrow g}{g}$ &
@@ -1656,8 +1665,8 @@ inference rules in proofs, they should be \textcolor{blue}{correct} in the sense
 \end{Definition}
 With this definition, we see that
 the rules of inference referred to above as ``\textcolor{blue}{Modus Ponens}'' and ``\textcolor{blue}{Modus Tollens}''
-are correct, while the one called ``\textcolor{blue}{Nonsense}''
-is not correct.
+are correct, while the one called ``\textcolor{blue}{Denying the Antecedent}''
+is, in fact, a \href{https://en.wikipedia.org/wiki/List_of_fallacies}{logical fallacy}.\index{fallacy}
 
 From now on, we assume that all formulas are clauses. On one hand, this is
 not a real restriction, as we can transform any formula into an equivalent set of
@@ -1885,7 +1894,8 @@ the concept of \textcolor{blue}{satisfiability}, which we introduce next.
   \hspace*{1.3cm}
   $\mathcal{I}(f) = \texttt{True}$ \quad for all $f \in M$,
   \\[0.2cm]
-  then we call $M$ \textcolor{blue}{satisfiable}.
+  then we call $M$ \textcolor{blue}{satisfiable}.\index{satisfiable}  In this case the propositional
+  interpretation $\mathcal{I}$ is called a \blue{solution}\index{solution} of $M$.
   Furthermore, we say that $M$ is \textcolor{blue}{unsatisfiable}\index{unsatisfiable}
   and write 
   \\[0.2cm]
@@ -1934,8 +1944,8 @@ holds. \eox
 If $M$ is a finite set of clauses, we can extend $M$ to a saturated set of clauses
 $\overline{M}$ by initializing $\overline{M}$ as the set $M$ and then continually applying the
 cut rule to clauses from $\overline{M}$ and adding them to the set $\overline{M}$ as long as this is possible.
-Since there is only a limited number of clauses that can be formed from a given finite set of propositional variables,
-this process must terminate, and the set of formulas we then obtain is saturated. \eox
+Since there is only a limited number of clauses in set notation that can be formed from a given finite set of
+propositional variables, this process must terminate, and the set of formulas we then obtain is saturated. \eox 
 
 \subsection{Refutational Completeness}
 We are now ready to state and proof the refutational completeness of the cut rule for propositional logic.
@@ -2544,10 +2554,10 @@ $\mathcal{I}_k$ that we specified in the proof of refutation completeness.
 % \end{enumerate}
 
 \section{The Algorithm of Davis and Putnam}
-In practice, the we often have to compute a propositional assignment $\I$ for a given set of clauses $K$ such that
+In practice, we often have to compute a propositional assignment $\I$ for a given set of clauses $K$ such that
 \\[0.2cm]
 \hspace*{1.3cm} $\texttt{evaluate}(C,\I) = \texttt{True}$ \quad for all $C \in K$ \\[0.2cm]
-holds. In this case,  the assignment $\I$ is a \blue{solution} of the set of clauses $K$. In
+holds. In this case,  the assignment $\I$ is a \blue{solution}\index{solution} of the set of clauses $K$. In
 the last section, we have already introduced the function \texttt{findValuation} which can be used to compute
 such a solution of a set of clauses.  Unfortunately, this function is too inefficient to be useful in
 practice.
@@ -2636,16 +2646,17 @@ definitions.
 \end{Definition}
 
 How can we transform a given set of clauses into a trivial set of clauses?
-There are three ways to simplify a set of clauses.  We are already familiar with the first of the two
-possibilities, and we will explain the other two in more detail later. 
+There are three ways to simplify a set of clauses:
 \begin{enumerate}
-\item \blue{Resolution Rule},
+\item \blue{The Cut Rule},
 \item \blue{Subsumption}, and
 \item \blue{Case Distinction}.
 \end{enumerate}
+We are already familiar with the first of the two
+possibilities, and we will explain the other two in more detail later.
 Next, we will consider these possibilities in turn.
 
-\subsection{Simplification with the Resolution Rule}
+\subsection{Simplification with the Cut Rule}
 A typical application of the resolution rule has the form: \\[0.2cm]
 \hspace*{1.3cm} $\schluss{ C_1 \cup \{p\} \quad \{\neg p\} \cup C_2}{C_1 \cup C_2}$
 \\[0.2cm]
@@ -3141,9 +3152,9 @@ Davis and Putnam.  We will discuss the solution of two puzzles:
 \item We start with the
       \href{https://en.wikipedia.org/wiki/Eight_queens_puzzle}{8-Queens Problem}. 
 \item As a second example we discuss the
-      \href{https://en.wikipedia.org/wiki/Zebra_puzzle}{Zebra Puzzle}.  This
-      puzzle is also known as \blue{Einstein's Riddle}, even though there is no
-      evidence that it is related to Albert Einstein in any way.
+      \href{https://en.wikipedia.org/wiki/Zebra_puzzle}{Zebra Puzzle}.  This puzzle is also known as
+      \href{https://www.brainzilla.com/logic/zebra/einsteins-riddle/}{Einstein's Riddle},
+      even though there is no evidence that it is related to Albert Einstein in any way.
 \end{enumerate}
 
 \subsection{The 8-Queens Problem}
@@ -3158,7 +3169,7 @@ piece is either
 \item on the same diagonal
 \end{itemize}
 as the queen. Figure \ref{fig:queens-problem} on page \pageref{fig:queens-problem}
-shows a chessboard where in a queen is placed in the third row of the fourth
+shows a chessboard where a queen is placed in the third row of the fourth
 column. This queen can move to all 
 the fields marked with arrows, and thus can attack pieces that are placed on these fields.
 
@@ -3377,9 +3388,9 @@ variables are simultaneously true can be written as a set of clauses in the form
 \hspace*{1.3cm}
 $\bigl\{\, \{ \neg p, \neg q \} \;|\; p \in V \wedge\ q \in V \wedge p \neq q \bigr\}$
 \\[0.2cm]
-We implement these considerations in a \textsl{Python} function. The function \texttt{atMostOne}() shown in Figure \ref{fig:atMostOne}
-receives as input a set $S$ of propositional variables. The call $\texttt{atMostOne}(S)$ calculates a set of
-clauses. These clauses are true if and only if at most one of the variables in $S$
+We implement these ideas in a \textsl{Python} function. The function \texttt{atMostOne} shown in Figure
+\ref{fig:atMostOne} receives as input a set $S$ of propositional variables. The call $\texttt{atMostOne}(S)$
+calculates a set of clauses. These clauses are true if and only if at most one of the variables in $S$
 has the value \texttt{True}.
 
 With the help of the function \texttt{atMostOne}, we can now implement the function
@@ -3395,7 +3406,7 @@ in the set
 \hspace*{1.3cm}
 $\bigl\{ \texttt{var}(\texttt{row},j) \mid j \in \{1, \cdots, n \} \bigr\}$
 \\[0.2cm]
-and call the function $\texttt{atMostOne}()$ with this set, which delivers the result
+and call the function $\texttt{atMostOne}$ with this set, which delivers the result
 as a set of clauses.
 
 \begin{figure}[!ht]
@@ -3686,10 +3697,11 @@ The efficient solution of such problems is a subject of current research.
   \label{fig:8-queens.pdf}
 \end{figure}
 \FloatBarrier
+\pagebreak
 
-
-\subsection{The Zebra Puzzle \label{section:zebra}} 
-The following logical puzzle appeared in the magazine \blue{Life International}
+\subsection{The \href{https://en.wikipedia.org/wiki/Zebra_Puzzle}{Zebra Puzzle} \label{section:zebra}} 
+The following logical puzzle appeared in the magazine
+\href{https://en.wikipedia.org/wiki/Life_(magazine)}{Life International} 
 on  December, $17^\textrm{th}$  in the year 1962:
 \begin{itemize}
 \item There are five houses.
@@ -3705,7 +3717,7 @@ on  December, $17^\textrm{th}$  in the year 1962:
 \item The man who smokes Chesterfields lives in the house next to the man with the fox.
 \item Kools are smoked in the house next to the house where the horse is kept.
 \item The Lucky Strike smoker drinks orange juice.
-\item The Japanese smokes Parliaments.*
+\item The Japanese smokes Parliaments.
 \item The Norwegian lives next to the blue house.
 \end{itemize}
 Furthermore, each of the five houses is painted in a different colour, their
@@ -3725,49 +3737,50 @@ that the Englishman lives in the $i^\textrm{th}$ house we can use the variables
 \hspace*{1.3cm}
 $\texttt{English}\langle i \rangle$ \quad for $i=1,\cdots,5$.
 \\[0.2cm]
-The idea is that $\texttt{English}\langle i \rangle$ is \texttt{True} iff the
+The idea is that the variable $\texttt{English}\langle i \rangle$ is \texttt{True} iff the
 Englishman lives in the  $i^\textrm{th}$ house.  In a similar way we use the
 variables
-\begin{itemize}
-\item $\texttt{Spanish}\langle i \rangle$,
-\item $\texttt{Ukrainian}\langle i \rangle$,
-\item $\texttt{Norwegian}\langle i \rangle$, and 
-\item $\texttt{Japanese}\langle i \rangle$
-\end{itemize}
-to encode the houses, where the people of different nationalities live.
+\\[0.2cm]
+\hspace*{1.3cm}
+$\texttt{Spanish}\langle i \rangle$,\;
+$\texttt{Ukrainian}\langle i \rangle$,\;
+$\texttt{Norwegian}\langle i \rangle$,\; and 
+$\texttt{Japanese}\langle i \rangle$
+\\[0.2cm]
+to encode where the people of different nationalities live.
 The different drinks are encoded by the variables
 \\[0.2cm]
 \hspace*{1.3cm}
-$\texttt{Coffee}\langle i \rangle$, $\texttt{Milk}\langle i \rangle$, $\texttt{OrangeJuice}\langle i \rangle$, $\texttt{Tea}\langle i \rangle$, and $\texttt{Water}\langle i \rangle$.
+$\texttt{Coffee}\langle i \rangle$,\; $\texttt{Milk}\langle i \rangle$,\; $\texttt{OrangeJuice}\langle i \rangle$,\; $\texttt{Tea}\langle i \rangle$,\; and $\texttt{Water}\langle i \rangle$.
 \\[0.2cm] 
 The colours are encoded using the variables 
 \\[0.2cm]
 \hspace*{1.3cm}
-$\texttt{Red}\langle i \rangle$,
-$\texttt{Green}\langle i \rangle$,
-$\texttt{Ivory}\langle i \rangle$,
-$\texttt{Yellow}\langle i \rangle$, and $\texttt{Blue}\langle i \rangle$.
+$\texttt{Red}\langle i \rangle$,\;
+$\texttt{Green}\langle i \rangle$,\;
+$\texttt{Ivory}\langle i \rangle$,\;
+$\texttt{Yellow}\langle i \rangle$,\; and $\texttt{Blue}\langle i \rangle$.
 \\[0.2cm]
 The pets are encoded using the variables
 \\[0.2cm]
 \hspace*{1.3cm}
-$\texttt{Dog}\langle i \rangle$,
-$\texttt{Snails}\langle i \rangle$,
-$\texttt{Fox}\langle i \rangle$,
-$\texttt{Horse}\langle i \rangle$,
+$\texttt{Dog}\langle i \rangle$,\;
+$\texttt{Snails}\langle i \rangle$,\;
+$\texttt{Fox}\langle i \rangle$,\;
+$\texttt{Horse}\langle i \rangle$,\;
 and $\texttt{Zebra}\langle i \rangle$.
 \\[0.2cm]
 The cigarette brands are encoded as
 \\[0.2cm]
 \hspace*{1.3cm}
-$\texttt{OldGold}\langle i \rangle$, $\texttt{Kools}\langle i \rangle$,
-$\texttt{Chesterfields}\langle i \rangle$, $\texttt{LuckyStrike}\langle i \rangle$, and
+$\texttt{OldGold}\langle i \rangle$,\; $\texttt{Kools}\langle i \rangle$,\;
+$\texttt{Chesterfields}\langle i \rangle$,\; $\texttt{LuckyStrike}\langle i \rangle$,\; and
 $\texttt{Parliaments}\langle i \rangle$.
 \\[0.2cm]
 We are using the angular brackets "$\langle$" and "$\rangle$" as part of the
 variable names because our parser for propositional logic accepts these symbols
 as part of variable names.  The parser would be confused if we would use the
-normal parenthesis. 
+normal parenthesis.  
 
 \begin{figure}[!ht]
 \centering
@@ -3791,7 +3804,7 @@ normal parenthesis.
 In order to be able to write the conditions concisely, we introduce the function
 $\texttt{var}(f, i)$, which is shown in Figure \ref{fig:var_f_i}.  This function
 takes a string $f$, where $f$ is a property like, e.g.~\texttt{Japanese} and an
-integer $i$ and returns the string $f\langle i\rangle$.
+integer $i \in \{1,\cdots,5\}$ and returns the string $f\langle i\rangle$.
 
 
 
@@ -3818,11 +3831,12 @@ The function $\texttt{somewhere}(x)$ that is shown in Figure \ref{fig:somewhere}
 takes a string $x$ as its argument, where $x$ denotes a property like,
 e.g.~\texttt{Japanese}.  It returns a clause that specifies that $x$ has to be
 located in one of the five houses.  For example,  the call
-$\texttt{somewhere('Japanese')}$ returns the following clause:
+$\texttt{somewhere('Japanese')}$ returns the clause
 \\[0.2cm]
-\hspace*{0.3cm}
-\texttt{frozenset({'Japanese<1>', 'Japanese<2>', 'Japanese<3>', 'Japanese<4>', 'Japanese<5>'})}
-
+\hspace*{1.3cm}
+\texttt{\{'Japanese<1>', 'Japanese<2>', 'Japanese<3>', 'Japanese<4>', 'Japanese<5>'\}}
+\\[0.2cm]
+as a \texttt{frozenset}.
 
 \begin{figure}[!ht]
 \centering
@@ -3843,7 +3857,7 @@ $\texttt{somewhere('Japanese')}$ returns the following clause:
 \label{fig:atMostOneAt}
 \end{figure}
 
-Given an exclusive set of properties $S$ and a house number $i$, the function
+Given an set of properties $S$ and a house number $i$, the function
 $\texttt{atMostOne}(S, i)$ returns a set of clauses that specifies that the
 person living in house number $i$ has at most one of the properties from the set
 $S$.  For example, if  
@@ -3868,9 +3882,8 @@ makes use of the function \texttt{atMostOne} that is shown in Figure
                  xrightmargin  = 0.8cm,
                  ]{python3}
     def onePerHouse(S):
-        Clauses = { somewhere(x) for x in S } 
-        for i in range(1, 5+1):
-            Clauses |= atMostOneAt(S, i)
+        Clauses  = { somewhere(x) for x in S } 
+        Clauses |= { C for i in range(1, 5+1) for C in atMostOneAt(S, i) }
         return Clauses
 \end{minted}
 \vspace*{-0.3cm}
@@ -3908,31 +3921,32 @@ clauses that express the fact that these five persons live in different houses.
 \label{fig:sameHouse}
 \end{figure}
 
-Given to properties $a$ and $b$ the function $\texttt{sameHouse}(a, b)$ that is
+Given two properties $a$ and $b$ the function $\texttt{sameHouse}(a, b)$ that is
 shown in Figure \ref{fig:sameHouse} computes
 a set of clauses that specifies that if the inhabitant of house number $i$ has
 the property $a$, then he also has the the property $b$ and vice versa.  For
 example, $\texttt{sameHouse}(\texttt{"Japanese"}, \texttt{"Dog"})$ specifies
-that the Japanese guy keeps a dog. 
+that the Japanese guy keeps a dog.  The function \texttt{parseKNF} that is used here takes a string, converts
+it into a formula from propositional logic, and finally converts this formula into \textsc{Cnf}.
 
 
 \begin{figure}[!ht]
 \centering
 \begin{minted}[ frame         = lines, 
-                 framesep      = 0.3cm, 
+                 framesep      = 0.2cm, 
                  firstnumber   = 1,
                  bgcolor       = sepia,
                  numbers       = left,
                  numbersep     = -0.2cm,
-                 xleftmargin   = 0.8cm,
-                 xrightmargin  = 0.8cm,
+                 xleftmargin   = 0.0cm,
+                 xrightmargin  = 0.0cm,
                ]{python3}
-    def nextTo(a, b):
-        Result = parseKNF(f"{var(a,1)} → {var(b,2)}")
-        for i in [2, 3, 4]:
-            Result |= parseKNF(f"{var(a,i)} → {var(b,i-1)} ∨ {var(b,i+1)}")
-        Result |= parseKNF(f"{var(a,5)} → {var(b,4)}")
-        return Result
+  def nextTo(a, b):
+      Result  = parseKNF(f"{var(a,1)} → {var(b,2)}")
+      Result |= { C for i in [2,3,4]
+                    for C in parseKNF(f"{var(a,i)} → {var(b,i-1)} ∨ {var(b,i+1)}") }
+      Result |= parseKNF(f"{var(a,5)} → {var(b,4)}")
+      return Result
 \end{minted}
 \vspace*{-0.3cm}
 \caption{nextTo}
@@ -4157,6 +4171,440 @@ You should edit this notebook in order to solve the given problem.
 
 \pagebreak
 
+\section{Sudoku and PicoSat}
+As a final example we will solve a \href{https://en.wikipedia.org/wiki/Sudoku}{Sudoku} puzzle.  In particular,
+we will solve an instance of a Sudoku puzzle that was created by Arto Inkala.  He claims that this is the
+\href{https://abcnews.go.com/blogs/headlines/2012/06/can-you-solve-the-hardest-ever-sudoku}{hardest solvable instance}
+of a Sudoku puzzle.  Figure \ref{fig:sudoku.png} shows the Sudoku created by Arto Inkala.
+
+\begin{figure}[!ht]
+  \centering
+  \framebox{\epsfig{file=Figures/sudoku.png, scale=0.5}} 
+  \caption{The Sudoku puzzle created by Arto Inkala.}
+  \label{fig:sudoku.png}
+\end{figure}
+
+A Sudoku puzzle is a logic-based, combinatorial number-placement puzzle. The objective is to fill a
+$9 \times 9$ grid with digits from the set $\{1, \cdots, 9\}$ so that each column, each row, and each of the
+nine $3 \times 3$ subgrids that compose the grid (also called "boxes") contain all of these digits exactly
+once.  The puzzle is given as a partially completed grid.  A well-posed puzzle must have a single unique
+solution.
+
+In order to formulate a Sudoku as a satisfiablity problem from propositional logic, we will use the following
+set of propositional variables:
+\\[0.2cm]
+\hspace*{1.3cm}
+$\mathcal{P} = \bigl\{ Q_{r,c,d} \mid r \in \{1,\cdots, 9\} \wedge c \in \{1,\cdots, 9\} \wedge r \in \{1,\cdots, 9\} \bigl\}$
+\\[0.2cm]
+The variable $Q_{r,c,d}$ is supposed to be \texttt{True} if $d$ is the digit in row $r$ and column $c$ of the
+Sudoku.  Note that this means that we have $9^3 = 729$ different propositional variables.  In our
+implementation we will use the function \texttt{var} shown in Figure \ref{fig:sudoku-var} to create these variables.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def var(row, col, digit):
+        return f'Q<{row},{col},{digit}>'
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{var}.}
+\label{fig:sudoku-var}
+\end{figure}
+
+The Sudoku itself is created by the function \texttt{create\_puzzle} shown in Figure
+\ref{fig:sudoku-create-puzzle} on page \pageref{fig:sudoku-create-puzzle}.  In this function, the puzzle is
+represented as a list of lists.  Each of these lists represents a row.  The inner lists contain digits and the
+characters \texttt{"*"}.  These characters represent the digits that are initially unknown and whose value have
+to be computed.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def create_puzzle():
+        return [ [ 8 , "*", "*", "*", "*", "*", "*", "*", "*"], 
+                 ["*", "*",  3 ,  6 , "*", "*", "*", "*", "*"],
+                 ["*",  7 , "*", "*",  9 , "*",  2 , "*", "*"],
+                 ["*",  5 , "*", "*", "*",  7 , "*", "*", "*"],
+                 ["*", "*", "*", "*",  4 ,  5 ,  7 , "*", "*"],
+                 ["*", "*", "*",  1 , "*", "*", "*",  3 , "*"],
+                 ["*", "*",  1 , "*", "*", "*", "*",  6 ,  8 ],
+                 ["*", "*",  8 ,  5 , "*", "*", "*",  1 , "*"],
+                 ["*",  9 , "*", "*", "*", "*",  4 , "*", "*"]
+               ]
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{create\_puzzle}.}
+\label{fig:sudoku-create-puzzle}
+\end{figure}
+
+In our implementation we will use functions \texttt{atMostOne} that we have already seen in Figure
+\ref{fig:atMostOne} on page \pageref{fig:atMostOne} that expresses that at most one of a given set of
+propositional variables is \texttt{True}.  Furthermore, we will use the auxiliary function
+$\texttt{atLeastOne}(V)$ which takes a set of propositional variables $V$ and which returns a formula in
+conjunctive normal form in set notation that is \texttt{True} if and only if at least one of the variables in
+$V$ is \texttt{True}.  Note that in set notation we have
+\\[0.2cm]
+\hspace*{1.3cm}
+$\texttt{atLeastOne}(V) = \bigl\{ V \bigr\}$.
+\\[0.2cm]
+The reason is that in set notation  $V$ is interpreted as a clause, i.e.~as a disjunction of its variables.
+Using these two functions we can then define a function $\texttt{exactlyOne}(V)$ that
+takes a set of variables and returns \texttt{True} iff exactly one of the variables in $V$ is \texttt{True}.
+The implementation is shown in Figure \ref{fig:sudoku-exactly}.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def atLeastOne(S):
+        return { frozenset(S) }
+    
+    def exactlyOne(S):
+        return atMostOne(S) | atLeastOne(S)
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The functions \texttt{atLeastOne} and \texttt{exactlyOne}.}
+\label{fig:sudoku-exactly}
+\end{figure}
+
+Figure \ref{fig:sudoku-exactlyOnce} show the implementation of the function
+$\texttt{exactlyOnce}(L)$.  This function takes a set $L$ of pairs as arguments.  Every pair $(r,c) \in L$ is
+interpreted as a position in the Sudoku grid whre $r$ specifies the row and $c$ specifies the column of the
+position.  The function $\texttt{exactlyOnce}$ computes a set of formulas that express that every digit
+$d \in \{1,\cdots,9\}$ occurs exactly once in the set of coordinates $L$: 
+\\[0.2cm]
+\hspace*{1.3cm}
+$\texttt{exactlyOnce}(L) = \bigcup\limits_{d \in \{1,\cdots,9\}} \mathtt{exactlyOne}\bigl(\bigl\{ Q_{r,c,d} \mid (r,c) \in L \bigl\}\bigr)$
+
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def exactlyOnce(L):
+        Clauses = set()
+        for digit in range(1, 10):
+            Clauses |= exactlyOne({ var(col, row, digit)  for col, row in L })
+        return Clauses
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{exactlyOnce}.}
+\label{fig:sudoku-exactlyOnce}
+\end{figure}
+
+The function $\texttt{exactlyOneDigit}(r, c)$ takes a row $r$ and a column $c$ as its argument.  It returns a
+formula expressing that exactly one of the variables from the set
+\\[0.2cm]
+\hspace*{1.3cm}
+$\bigl\{ Q_{r,c,d} \mid d \in \{1,\cdots, 9\} \bigr\}$
+\\[0.2cm]
+is \texttt{True}. The implementation is shown in Figure \ref{fig:sudoku-exactlyOneDigit}.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def exactlyOneDigit(row, col):
+        return exactlyOne({ var(row, col, digit) for digit in range(1, 10) })
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{exactlyOneDigit}.}
+\label{fig:sudoku-exactlyOneDigit}
+\end{figure}
+
+
+Furthermore, we need a function encoding the constraints form the puzzle itself.
+This function is called \texttt{constraintsFromPuzzle} and its implementation is shown in Figure
+\ref{fig:sudoku-constraintsFromPuzzle} on page \pageref{fig:sudoku-constraintsFromPuzzle}.
+For example, the given puzzle demands that the digit in row 2 and column 4 is the digit $6$.
+This can be expressed as the formula $Q_{2,3,6}$.  In set notation this formula takes the form
+\\[0.2cm]
+\hspace*{1.3cm}
+$\bigl\{ \{Q_{2,3,6}\} \bigr\}$.
+\\[0.2cm]
+Of course, we have to take the union of all these formula.  This leads to the code shown in Figure
+\ref{fig:sudoku-constraintsFromPuzzle} on page \pageref{fig:sudoku-constraintsFromPuzzle}.
+Note that we have to provide \texttt{row+1} and \texttt{col+1} as arguments to the function \texttt{var} since
+in Python list indices start with $0$.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.0cm,
+                 xrightmargin  = 0.0cm,
+                 ]{python3}
+    def constraintsFromPuzzle():
+        Puzzle = create_puzzle()
+        Variables = [ var(row+1, col+1, Puzzle[row][col]) for row in range(9)
+                                                          for col in range(9)
+                                                          if  Puzzle[row][col] != '*'
+                    ]
+        return { frozenset({ var }) for var in Variables }                 
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{constraintsFromPuzzle}}
+\label{fig:sudoku-constraintsFromPuzzle}
+\end{figure}
+
+Finally, we have to combine all constraints of the puzzle.  This is done with the function \\
+\texttt{allConstraints} shown in Figure \ref{fig:sudoku-allConstraints} shown on page \pageref{fig:sudoku-allConstraints}.
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+def allConstraints(): 
+    L = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    # the constraints from the puzzle have to be satisfied
+    Clauses = constraints_from_puzzle()
+    # there is exactly one digit in every field
+    for row in L:
+        for col in L:
+            Clauses |= exactlyOneDigit(row, col) 
+    # all entries in a row are unique
+    for row in L:
+        Clauses |= exactlyOnce([ (row, col) for col in L ]) 
+    # all entries in a column are unique
+    for col in L:
+        Clauses |= exactlyOnce([ (row, col) for row in L ])
+    # all entries in a 3x3 box are unique    
+    for r in range(3):
+        for c in range(3):
+            S = [ (r * 3 + row, c * 3 + col) for row in range(1, 4)
+                                             for col in range(1, 4) 
+                ]
+            Clauses |= exactlyOnce(S)
+    return Clauses
+ \end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{allConstraints}.}
+\label{fig:sudoku-allConstraints}
+\end{figure}
+The Jupyter notebook showing the resulting program is available at:
+\\[0.2cm]
+\hspace*{1.3cm}
+\href{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-4/10-Sudoku.ipynb}{\texttt{github.com/karlstroetmann/Logic/blob/master/Python/Chapter-4/10-Sudoku.ipynb}}
+
+
+\pagebreak
+
+\hspace*{\fill}
+\pagebreak
+
+\subsection{PicoSat}
+Unfortunately, solving the resulting set of clauses takes about 10 minutes.  Fortunately, there is a version
+of the Davis-Putnam algorithm that is implemented in \texttt{C} and that, furthermore, incorporates a number of
+improvements to the original algorithm.  This solver is called \href{https://fmv.jku.at/picosat/}{PicoSat}
+and has been implemented by \href{https://cca.informatik.uni-freiburg.de/biere/}{Armine Biere}
+A \href{https://github.com/conda/pycosat}{Python API} to this solver is available as
+\href{https://pypi.org/project/pycosat/}{pycosat}.  We can install it via \texttt{pip} using the following command:
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{pip install pycosat}
+\\[0.2cm]
+In \textsl{PicoSat} propositional variables are represented as follows:
+\begin{enumerate}
+\item A propositional variable $p$ is represented as a positive natural number.
+\item If $n$ is the natural number representing the propositional variable $p$, then $\neg p$ is represented as
+      the integer $-n$. 
+\item A clause is represented as a list of integers.
+\item A formula in CNF is represented as a list of clauses and hence as a list of list of integers.
+\end{enumerate}
+For example, if the propositional variables $p$, $q$, and $r$ are represented as the natural numbers
+$1$, $2$, and $3$ respectively, then
+\begin{enumerate}
+\item $p \vee \neg q \vee r$ is represented as the list \texttt{[1, -2, 3]},
+\item $\neg p \vee q \vee \neg r$ is represented as the list \texttt{[-1, 2, -3]},
+\item $\neg p \vee \neg q \vee r$ is represented as the list \texttt{[-1, -2, 3]}, and
+\item $p \vee q \vee \neg r$ is represented as the list \texttt{[1, 2, -3]}.
+\end{enumerate}
+Finally, the formula 
+$$ f = (p \vee \neg q \vee r) \wedge (\neg p \vee q \vee \neg r) \wedge (\neg p \vee \neg q \vee r) \wedge (p \vee q \vee \neg r), $$
+which is in conjunctive normal form, is represented as follows:
+\\[0.2cm]
+\hspace*{1.3cm}
+\texttt{f = [ [1, -2, 3], [-1, 2, -3], [-1, -2, 3], [1, 2, -3] ]}
+\\[0.2cm]
+In order so find a solution to this formula we can call $\texttt{pycosat.solve}(f)$.
+
+\pagebreak
+\subsubsection{Transforming Clauses into PyCoSat Format}
+In order to use \textsl{PicoSat} to solve the Sudoku discussed earlier, we need a function that transforms a
+formula that is in conjunctive normal form into the format of \textsl{PicoSat}.  Furthermore, we need  a function that can translate a solution found by \textsl{PicoSat} back into our format.
+
+The function \texttt{findVariables(Clauses)} in Figure \ref{fig:sudoku-findVariables} on page
+\pageref{fig:sudoku-findVariables} takes a set of clauses and returns the set of all propositional variables
+occurring in this set.
+
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def findVariables(Clauses):
+        Variables = set()
+        for Clause in Clauses:
+            for literal in Clause:
+                match literal:
+                    case ('¬', var): Variables |= { var }
+                    case var       : Variables |= { var }
+        return Variables
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{findVariables}.}
+\label{fig:sudoku-findVariables}
+\end{figure}
+
+The function \texttt{numberVariables(Clauses)} takes a set of clauses as input.  It returns two dictionaries:
+\begin{enumerate}
+\item The dictionary \texttt{Var2Int} maps every propositional variable occurring in \texttt{Clauses} to a
+      unique natural number. 
+\item The dictionary \texttt{Int2Var} is the mapping that is inverse to the dictionary \texttt{Var2Int}.
+      Hence it maps the natural numbers back to propositional variables.
+\end{enumerate}
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def numberVariables(Clauses):
+        Variables = findVariables(Clauses)
+        count     = 1
+        Var2Int   = {}
+        Int2Var   = {}
+        for variable in Variables:
+            Var2Int[variable] = count
+            Int2Var[count   ] = variable
+            count += 1
+        return Var2Int, Int2Var             
+\end{minted}
+\vspace*{-0.3cm}
+\caption{The function \texttt{numberVariables}}
+\label{fig:sudoku-numberVariables}
+\end{figure}
+
+\pagebreak
+Figure \ref{fig:sudoku-format} shows the remaining auxiliary functions that are necessary to transform a
+formula represented as a set of clauses into the format of PicoSat.
+\begin{enumerate}
+\item The function \texttt{literal2int} takes a literal and transforms this literal into an integer
+      representing the literal. If the literal is a negated variable, the integer is negative, else it is
+      positive. \texttt{Var2Int} is a dictionary mapping propositional variables to natural numbers.
+\item The function \texttt{clause2pyco(Clause, Var2Int)} transforms a set of literals into a list of integers.
+      \texttt{Var2Int} is a dictionary mapping the propositional variables to natural numbers. 
+\item The function \texttt{clauses2pyco(Clauses, Var2Int)} transforms a set of clauses into a list of lists of
+      integers. \texttt{Var2Int} is a dictionary mapping the propositional variables to natural numbers.  
+\item The function \texttt{int2var(Numbers, Int2Var)} takes a list of numbers representing a set of literals and returns
+      the associated list of literals.  \texttt{Int2Var} is a dictionary mapping natural numbers to
+      propositional variables.     
+\end{enumerate}
+
+\begin{figure}[!ht]
+\centering
+\begin{minted}[ frame         = lines, 
+                 framesep      = 0.3cm, 
+                 firstnumber   = 1,
+                 bgcolor       = sepia,
+                 numbers       = left,
+                 numbersep     = -0.2cm,
+                 xleftmargin   = 0.8cm,
+                 xrightmargin  = 0.8cm,
+               ]{python3}
+    def literal2int(literal, Var2Int):
+        match literal:
+            case ('¬', var): return -Var2Int[var]
+            case var       : return  Var2Int[var]
+    
+    def clause2pyco(Clause, Var2Int):
+        return [literal2int(literal, Var2Int) for literal in Clause]
+    
+    def clauses2pyco(Clauses, Var2Int):
+        return [clause2pyco(clause, Var2Int) for clause in Clauses ]
+    
+    def int2var(Numbers, Int2Var):
+        Result = set()
+        for n in Numbers:
+            if n > 0:
+                Result |= {frozenset({Int2Var[n]})}
+            else: 
+                Result |= {frozenset({ ('¬', Int2Var[-n]) })}
+        return Result
+\end{minted}
+\vspace*{-0.3cm}
+\caption{Some axilliary functions to transform clauses into the format of PicoSat.}
+\label{fig:sudoku-format}
+\end{figure}
+
+The Jupyter notebook showing the resulting program is available at:
+\\[0.2cm]
+\hspace*{0.3cm}
+\href{https://github.com/karlstroetmann/Logic/blob/master/Python/Chapter-4/11-PicoSat-Sudoku.ipynb}{\texttt{github.com/karlstroetmann/Logic/blob/master/Python/Chapter-4/11-PicoSat-Sudoku.ipynb}}
+
+\pagebreak
+
 
 \section{Check Your Comprehension}
 \begin{enumerate}[(a)]
@@ -4166,8 +4614,14 @@ You should edit this notebook in order to solve the given problem.
 \item What is a tautology?
 \item How can we transform propositional logic formula into conjunctive normal
       form?
+\item Define the notion of an inference rule.
+\item when is  an inference rule correct?
+\item Define the cut rule.
 \item How did we define the proof concept $M \vdash C$?
-\item What are the most important properties of the proof concept $\vdash$?
+\item What is a saturated set of clauses?
+\item What are the two most important properties of the proof concept $\vdash$?
+\item Assume that $M$ is a saturated set of clauses. How can we define a propositional interpretation
+      $\mathcal{I}$ such that $\mathcal{I}(C) = \mathtt{True}$ for all $C \in M$?
 \item How did we define the notion of a set of clauses being solvable?
 \item Do you know how the algorithm of Davis and Putnam works?
 \item Can you code a logical puzzle as a propositional formula?
